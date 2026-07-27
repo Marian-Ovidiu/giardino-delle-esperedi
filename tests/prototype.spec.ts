@@ -728,10 +728,26 @@ test.describe("OTTO full experience", () => {
       expect(await plates.count(), `#${id} has no plate`).toBeGreaterThanOrEqual(1);
     }
 
-    // Every plate actually resolves — a 404 renders as an empty box that reads
-    // as a broken layout rather than as a missing asset.
-    const broken = await page.locator(".piastra__img").evaluateAll((images) =>
-      images
+    // Plates are lazy. They must be brought into view first, or this measures
+    // lazy-loading rather than whether the files actually resolve.
+    const images = page.locator(".piastra__img");
+    const total = await images.count();
+    for (let i = 0; i < total; i += 1) {
+      await images.nth(i).scrollIntoViewIfNeeded();
+    }
+    await page.waitForFunction(
+      () =>
+        Array.from(document.querySelectorAll<HTMLImageElement>(".piastra__img")).every(
+          (img) => img.complete,
+        ),
+      undefined,
+      { timeout: 15_000 },
+    );
+
+    // Every plate actually resolves — a 404 renders as an empty box, which
+    // reads as a broken layout rather than as a missing asset.
+    const broken = await images.evaluateAll((nodes) =>
+      nodes
         .filter((img) => !(img instanceof HTMLImageElement) || img.naturalWidth === 0)
         .map((img) => (img as HTMLImageElement).getAttribute("src")),
     );
@@ -752,12 +768,14 @@ test.describe("OTTO full experience", () => {
     // Alt text and captions describe what is visible — never a place, an
     // owner, a person or a process. These images are narrative, not
     // documentary, and must not be readable as evidence.
-    const texts = await page.locator(".piastra").evaluateAll((figures) =>
-      figures.map(
-        (f) =>
-          `${f.querySelector("img")?.getAttribute("alt") ?? ""} ${f.querySelector("figcaption")?.textContent ?? ""}`,
-      ),
-    );
+    const texts = await page
+      .locator(".piastra")
+      .evaluateAll((figures) =>
+        figures.map(
+          (f) =>
+            `${f.querySelector("img")?.getAttribute("alt") ?? ""} ${f.querySelector("figcaption")?.textContent ?? ""}`,
+        ),
+      );
     const forbidden = [
       "azienda",
       "aziendal",

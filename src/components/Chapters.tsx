@@ -42,7 +42,11 @@ export function RoyalChapter() {
       <div className="chapter--royal__data">
         <RegistroDati rows={chapter.data} />
       </div>
-      <Piastra slot="re-materia" className="chapter--royal__piastra" sizes="(max-width: 767px) 100vw, 40vw" />
+      <Piastra
+        slot="re-materia"
+        className="chapter--royal__piastra"
+        sizes="(max-width: 767px) 100vw, 40vw"
+      />
     </section>
   );
 }
@@ -108,7 +112,11 @@ export function ConservationChapter() {
       <div className="chapter--conservation__data">
         <RegistroDati rows={chapter.data} />
       </div>
-      <Piastra slot="atmosfera-luce" className="chapter--conservation__piastra" sizes="(max-width: 767px) 100vw, 30vw" />
+      <Piastra
+        slot="atmosfera-luce"
+        className="chapter--conservation__piastra"
+        sizes="(max-width: 767px) 100vw, 30vw"
+      />
     </section>
   );
 }

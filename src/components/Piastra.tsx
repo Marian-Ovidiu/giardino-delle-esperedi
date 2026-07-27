@@ -34,10 +34,7 @@ export function Piastra({
   const decorative = asset.alt === "";
 
   return (
-    <figure
-      className={["piastra", className].filter(Boolean).join(" ")}
-      data-status={asset.status}
-    >
+    <figure className={["piastra", className].filter(Boolean).join(" ")} data-status={asset.status}>
       <div className="piastra__frame">
         <Image
           src={asset.src}

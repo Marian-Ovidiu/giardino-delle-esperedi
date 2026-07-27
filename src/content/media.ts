@@ -113,7 +113,10 @@ export const media: Record<MediaKey, MediaAsset | null> = {
   "pietra-farina": {
     src: "/images/generated/piastre/pietra-farina.avif",
     alt: "Macro di farina di mais, grana visibile.",
-    caption: "Farina, macinata a pietra.",
+    // NOT "Farina, macinata a pietra." — that attaches a verified process to a
+    // provisional, generic plate, which is the one thing these images may not
+    // do. The caption names the material and stops.
+    caption: "Farina.",
     width: 1600,
     height: 1000,
     status: "provvisorio",
