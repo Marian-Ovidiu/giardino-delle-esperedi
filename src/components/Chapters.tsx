@@ -237,12 +237,25 @@ export function ProductsChapter() {
                 <dt className="t-label">{catalogo.originLabel}</dt>
                 <dd className="t-data-lg">{product.originLabel}</dd>
               </div>
-              {product.format && (
+
+              {/* One row however many sizes exist, joined by the register's
+                  middot. Two formats do not earn two rows. */}
+              {product.formats.length > 0 && (
                 <div className="product__row">
                   <dt className="t-label">{catalogo.formatLabel}</dt>
-                  <dd className="t-data-lg">{product.format}</dd>
+                  <dd className="t-data-lg">{product.formats.join(" · ")}</dd>
                 </div>
               )}
+
+              {/* The extension point: style, strength, IBU, ingredients — each
+                  renders here in declaration order the moment it is confirmed,
+                  with no change to this component or the layout. */}
+              {product.specs?.map((spec) => (
+                <div className="product__row" key={spec.label}>
+                  <dt className="t-label">{spec.label}</dt>
+                  <dd className="t-data-lg">{spec.value}</dd>
+                </div>
+              ))}
             </dl>
 
             <div className="product__foot">

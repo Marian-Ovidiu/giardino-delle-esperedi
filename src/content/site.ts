@@ -11,8 +11,9 @@
  * See docs/content-plan.md §8 for the regulatory record. In short:
  *   · No nutrition or health claims anywhere. (EU Reg. 1924/2006 — the variety's
  *     properties in literature are not a claim about the finished product.)
- *   · `biologico` is a protected term (EU Reg. 2018/848). The Amaro line ships
- *     in its certification-free form until the client confirms otherwise.
+ *   · `biologico` is a protected term (EU Reg. 2018/848) and appears nowhere.
+ *     The Amaro's provenance sentence, which carried it, has been removed
+ *     entirely: the only confirmed cultivation is the Mais Rosso Ottofile.
  *   · `senza glutine` must never appear.
  */
 
@@ -170,11 +171,13 @@ export const chapters: readonly Chapter[] = [
     title: "Le referenze",
     standfirst: "Una terra sola. Una materia prima principale. Lavorazioni diverse.",
     body: [
-      "Il Mais Rosso Ottofile è la materia prima principale del Giardino, non l'unica: l'orto botanico aziendale dà le erbe dell'Amaro. Ogni scheda dichiara da che cosa nasce.",
-      "Il catalogo è aperto. Alcune schede sono ancora in preparazione.",
+      // Previously named the orto botanico as the Amaro's source. Removed:
+      // the only cultivation the client can confirm is the Mais Rosso.
+      "Il Mais Rosso Ottofile è la materia prima principale del Giardino. Ogni scheda dichiara da che cosa nasce, e dove l'origine non è ancora confermata la scheda lo dice.",
+      "Il catalogo è aperto. Alcune schede sono ancora parziali.",
     ],
     data: [],
-    railFact: "le lavorazioni del Giardino, dal mais all'orto botanico",
+    railFact: "le referenze del Giardino, dal mais in avanti",
   },
   {
     n: "08",
@@ -218,7 +221,12 @@ export const referenze = products.map((p, i) => ({
 export const catalogo = {
   entryLabel: "Referenza",
   originLabel: "Origine",
-  formatLabel: "Peso netto",
+  /**
+   * "Formato", not "Peso netto": the catalogue now holds both mass (500 g) and
+   * volume (0,75 L), and labelling a volume as a weight is simply wrong.
+   * "Formato" is already the term used in chapter 06's register rows.
+   */
+  formatLabel: "Formato",
   /** Rendered where no verified description exists. Never a fabricated one. */
   inPreparazione: "Scheda in preparazione.",
   status: {

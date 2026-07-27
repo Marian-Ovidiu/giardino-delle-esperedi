@@ -35,9 +35,11 @@ export const company = {
 } as const;
 
 /**
- * The protagonist ingredient — the principal raw material, NOT the only one.
- * The Amaro comes from the orto botanico, and nothing on record says what the
- * Birra is made from. Do not reintroduce "every product descends from it".
+ * The protagonist ingredient, and the ONLY cultivation the client has
+ * confirmed. Farina, Maisette, Maissini and Birra all descend from it. The
+ * Amaro's provenance is unknown and must not be attributed to it — nor to any
+ * other company cultivation. Do not reintroduce "every product descends from
+ * it": it is still not true, just for a different reason than before.
  */
 export const grain = {
   name: "Mais Rosso Ottofile",
@@ -63,12 +65,29 @@ export interface Product {
    * NEVER fill this in to make a card look complete.
    */
   definition: string | null;
-  /** Net weight as printed. `null` where the client has not confirmed one. */
-  format: string | null;
+  /**
+   * Net contents as printed, one entry per size on the shelf. Empty where the
+   * client has not confirmed any — never filled with a placeholder or a dash.
+   */
+  formats: readonly string[];
+  /**
+   * Additional register rows, rendered generically in declaration order.
+   *
+   * This is the extension point. Style, strength, IBU, ingredients — anything
+   * the client later confirms — is added here and appears in the layout with
+   * no change to the component or the CSS. Nothing may be added speculatively:
+   * an absent row is the correct rendering of an unknown fact.
+   */
+  specs?: readonly Spec[];
   /** What the product is transformed from. */
   origin: Origin;
   /** How complete the factual record is. Drives the card's rendered state. */
   status: RecordStatus;
+}
+
+export interface Spec {
+  label: string;
+  value: string;
 }
 
 /**
@@ -81,17 +100,30 @@ export type RecordStatus = "completo" | "parziale" | "in-preparazione";
 /**
  * What a product is transformed FROM.
  *
- * NOT every product descends from the maize. The Amaro is made from officinal
- * herbs grown in the company's own orto botanico, and nothing on record says
- * what the Birra is brewed from. Asserting a maize origin for either would be
- * an invention.
+ * The ONLY cultivation the client has confirmed is the Mais Rosso Ottofile.
+ *
+ * An `"orto-botanico"` value existed here until 2026-07-27 and has been
+ * removed deliberately. It came from the company's own public website, which
+ * describes an orto botanico aziendale supplying the Amaro's herbs — and the
+ * client has since told us that claim is not something we can stand behind.
+ * The enum member is gone rather than left unused, so it cannot be reattached
+ * to a product by autocomplete. If the client ever confirms it, add it back
+ * with the confirmation on file.
  */
-export type Origin = "mais" | "orto-botanico" | "da-verificare";
+export type Origin = "mais" | "da-verificare";
 
 /** Human-readable origin labels, for the register's provenance column. */
 export const origins: Record<Origin, string> = {
   mais: "Mais Rosso Ottofile",
-  "orto-botanico": "Orto botanico aziendale",
+  /*
+   * Neutral by construction: it records the absence of a confirmation and
+   * claims nothing about who grows, sources or transforms the product.
+   *
+   * "Produzione del Giardino" was the alternative on the table. Rejected:
+   * "produzione" reads as "made by", and who performs the transformation is
+   * one of the things we explicitly do not know. A register is allowed to say
+   * it does not know something — that is what makes the rest of it credible.
+   */
   "da-verificare": "Da verificare",
 };
 
@@ -112,7 +144,7 @@ export const products: readonly Product[] = [
     id: "farina",
     name: "Farina di Mais Rosso",
     definition: "Ottofile Integrale varietà Albese, macinata a pietra",
-    format: "500 g",
+    formats: ["500 g"],
     origin: "mais",
     status: "completo",
   },
@@ -120,7 +152,7 @@ export const products: readonly Product[] = [
     id: "maisette",
     name: "Maisette",
     definition: "Gallette di Mais Rosso Ottofile Integrale",
-    format: "120 g",
+    formats: ["120 g"],
     origin: "mais",
     status: "completo",
   },
@@ -129,32 +161,56 @@ export const products: readonly Product[] = [
     name: "Maissini",
     definition: "Grissini di mais, prodotti con farina di Mais Rosso Ottofile",
     // Net weight not confirmed by the client. The row is omitted rather than
-    // dashed: a dash in a weight field reads as "no weight".
-    format: null,
+    // dashed: a dash in a format field reads as "no format".
+    formats: [],
     origin: "mais",
     status: "parziale",
   },
   {
     id: "birra",
     name: "Birra",
-    // Nothing is on record: not the style, not the grain bill, not the format,
-    // not whether it uses the company's own maize. Left null on purpose.
-    definition: null,
-    format: null,
-    origin: "da-verificare",
-    status: "in-preparazione",
+    /*
+     * Client-confirmed: brewed with the company's own Mais Rosso Ottofile, and
+     * therefore a full member of the maize family rather than an outlier.
+     *
+     * The definition leads with the raw material, exactly like the other four,
+     * because the protagonist is the maize and not the brewery. Deliberately
+     * ABSENT and not to be added without written confirmation: the brewing
+     * style (never "IPA", "Blonde", "Amber" or "Lager"), the strength, the IBU,
+     * the ingredient list, and any mention of who brews it. When any of those
+     * are confirmed they go in `specs` below and render with no code change.
+     */
+    definition: "Prodotta con il Mais Rosso Ottofile coltivato in azienda",
+    formats: ["0,33 L", "0,75 L"],
+    origin: "mais",
+    status: "completo",
   },
   {
     id: "amaro",
     name: "Amaro del Dottore",
-    // The client's own wording is "coltivate con agricoltura biologica e
-    // simbiotica". `biologico` is protected under EU Reg. 2018/848 and needs
-    // certification plus a control-body code, which is not on record — so the
-    // certification-free wording ships. See docs/content-plan.md §8.2.
-    definition:
-      "Prodotto con le erbe officinali dell'orto botanico aziendale, coltivate con agricoltura simbiotica",
-    format: null,
-    origin: "orto-botanico",
+    /*
+     * The product and its name are confirmed. NOTHING about its provenance is.
+     *
+     * This card previously read "Prodotto con le erbe officinali dell'orto
+     * botanico aziendale, coltivate con agricoltura simbiotica" — sourced from
+     * the company's own public website. The client has since confirmed that
+     * the only cultivation we can stand behind is the Mais Rosso Ottofile, so
+     * that sentence asserted four things we cannot support: which botanicals
+     * are in it, who grows them, that they come from the company, and how they
+     * are farmed.
+     *
+     * The replacement claims nothing. Do not reintroduce, in any wording:
+     * "orto botanico", "erbe officinali", "coltivate in azienda", "botaniche
+     * aziendali", or a farming method. Unknown too, and equally not to be
+     * invented: the botanicals, the transformer, the format, the strength, the
+     * ingredients and the infusion method. There is a test guarding this.
+     *
+     * When the composition arrives it goes in `formats` and `specs` below and
+     * renders with no change to any component or stylesheet.
+     */
+    definition: "L'amaro botanico della collezione del Giardino",
+    formats: [],
+    origin: "da-verificare",
     status: "parziale",
   },
 ] as const;

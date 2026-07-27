@@ -522,19 +522,122 @@ test.describe("OTTO full experience", () => {
     await expect(byName("Farina di Mais Rosso")).toContainText("500 g");
     await expect(byName("Maissini")).toContainText("Grissini di mais");
 
-    // Maissini has no client-confirmed net weight: the row is omitted, never
+    // Maissini has no client-confirmed format: the row is omitted, never
     // dashed and never invented.
-    await expect(byName("Maissini").getByText("Peso netto")).toHaveCount(0);
+    await expect(byName("Maissini").getByText("Formato")).toHaveCount(0);
 
-    // Products with no verified record are reserved slots, not omissions, and
-    // must not be padded out with invented copy.
+    // Birra is a full member of the maize family: brewed with the company's
+    // own Mais Rosso, and sold in two sizes shown on one register row.
     const birra = products.filter({ hasText: "Birra" }).first();
-    await expect(birra).toHaveAttribute("data-status", "in-preparazione");
-    await expect(birra).toContainText("Scheda in preparazione");
+    await expect(birra).toHaveAttribute("data-status", "completo");
+    await expect(birra).not.toContainText("Scheda in preparazione");
+    await expect(birra).toContainText("Mais Rosso Ottofile");
+    await expect(birra).toContainText("0,33 L");
+    await expect(birra).toContainText("0,75 L");
     await expect(birra.locator(".product__cta")).toHaveCount(1);
 
-    // Not every product descends from the maize — asserting so would be false.
-    await expect(byName("Amaro del Dottore")).toContainText("Orto botanico");
+    // The Amaro's provenance is unknown, and the register says so rather than
+    // guessing. It is NOT visually demoted for it — see the dedicated test.
+    const amaro = products.filter({ hasText: "Amaro del Dottore" }).first();
+    await expect(amaro).toHaveAttribute("data-status", "parziale");
+    await expect(amaro).toContainText("Da verificare");
+  });
+
+  test("attributes no unconfirmed provenance to the Amaro", async ({ page }) => {
+    const amaro = page.locator('[data-product="amaro"]');
+    await expect(amaro).toHaveCount(1);
+    const text = (await amaro.innerText()).toLowerCase();
+
+    /*
+     * These exact formulations came from the company's own public website and
+     * were shipped as fact until the client confirmed that the only cultivation
+     * they can stand behind is the Mais Rosso Ottofile.
+     *
+     * The guard is on PHRASES, not words. "erbe", "botanico" and "officinali"
+     * are all legitimate once the real composition arrives — banning them would
+     * block the correct copy along with the wrong copy.
+     */
+    const unconfirmed = [
+      "orto botanico",
+      "coltivate in azienda",
+      "coltivato in azienda",
+      "erbe aziendali",
+      "botaniche aziendali",
+      "botaniche coltivate",
+      "erbe officinali",
+      "agricoltura simbiotica",
+      "biologic",
+    ];
+    for (const phrase of unconfirmed) {
+      expect(text, `"${phrase}" is not confirmed for the Amaro`).not.toContain(phrase);
+    }
+
+    // Nothing else about it is known either: no strength, no format, no method.
+    expect(text).not.toMatch(/\d+\s*(%|°|cl|ml|l\b)/);
+    for (const phrase of ["gradazione", "infusione", "distiller", "laboratorio", "ingredienti"]) {
+      expect(text, `"${phrase}" is not on record`).not.toContain(phrase);
+    }
+
+    // A partial record is still a product: full-strength name, no empty rows,
+    // and the same way to enquire as everything else.
+    await expect(amaro.locator(".product__cta")).toHaveCount(1);
+    await expect(amaro.locator(".product__name")).toHaveText("Amaro del Dottore");
+    const rows = amaro.locator(".product__row");
+    await expect(rows).toHaveCount(1); // origin only — no blank format or specs
+    for (let i = 0; i < (await rows.count()); i += 1) {
+      await expect(rows.nth(i).locator("dd")).not.toBeEmpty();
+    }
+  });
+
+  test("does not visually demote the Amaro for having a partial record", async ({ page }) => {
+    // Incomplete data must not read as a lesser product. The dimmed treatment
+    // is reserved for entries with no verified description at all.
+    const amaroName = page.locator('[data-product="amaro"] .product__name');
+    const birraName = page.locator('[data-product="birra"] .product__name');
+
+    const [amaroColor, birraColor] = await Promise.all([
+      amaroName.evaluate((el) => getComputedStyle(el).color),
+      birraName.evaluate((el) => getComputedStyle(el).color),
+    ]);
+    expect(amaroColor).toBe(birraColor);
+
+    const [amaroSize, birraSize] = await Promise.all([
+      amaroName.evaluate((el) => getComputedStyle(el).fontSize),
+      birraName.evaluate((el) => getComputedStyle(el).fontSize),
+    ]);
+    expect(amaroSize).toBe(birraSize);
+
+    // And the row itself is a solid register entry, not a provisional one.
+    const borderStyle = await page
+      .locator('[data-product="amaro"]')
+      .evaluate((el) => getComputedStyle(el).borderTopStyle);
+    expect(borderStyle).toBe("solid");
+  });
+
+  test("keeps the maize the protagonist of the Birra, not the brewery", async ({ page }) => {
+    const text = (await page.locator("#referenze").innerText()).toLowerCase();
+
+    // Whole words only. Substring matching is wrong here and quietly gives a
+    // false positive: "ipa" is inside "princ-ipa-le", and the standfirst says
+    // "una materia prima principale".
+    const styles = ["ipa", "blonde", "amber", "lager", "pilsner", "weiss", "stout"];
+    for (const style of styles) {
+      expect(text, `brewing style "${style}" is not on record`).not.toMatch(
+        new RegExp(`\\b${style}\\b`),
+      );
+    }
+
+    // Neither the brewer nor the technical spec sheet belongs here.
+    const banned = ["ibu", "birrificio", "brewery", "malto", "abv", "gradazione"];
+    for (const word of banned) {
+      expect(text, `"${word}" must not appear`).not.toMatch(new RegExp(`\\b${word}\\b`));
+    }
+    // Stem match: luppolo / luppoli / luppolato.
+    expect(text).not.toContain("luppol");
+
+    // What must be there is the agricultural origin.
+    const birra = page.locator('[data-product="birra"]');
+    await expect(birra.locator(".product__data")).toContainText("Mais Rosso Ottofile");
   });
 
   test("carries no copy that hard-codes the size of the range", async ({ page }) => {
