@@ -249,10 +249,110 @@ export const cta = {
   href: "#contatti",
 } as const;
 
+/**
+ * A pre-structured enquiry. This is the closest the site comes to a form, and
+ * deliberately so: there is no shop, no cart, no backend and no data
+ * collection. The reader's own mail client holds everything.
+ *
+ * The blank fields are prompts, not claims — they ask for information rather
+ * than promising anything about price, stock, shipping or turnaround.
+ */
+const richiestaBody = ["Referenze di interesse:", "", "Quantità:", "", "Nome e recapito:", ""].join(
+  "\n",
+);
+
+/**
+ * The conversion section.
+ *
+ * FACTUAL BOUNDARY — the company does NOT sell online. Real conversion is a
+ * phone call, an email, an availability enquiry, or buying in person at a
+ * fair. Nothing here may state a response time, a shipping option, a minimum
+ * order, a price, a collection point or a fair date: none of those are on
+ * record. What the copy describes is the shape of the conversation, not its
+ * outcome.
+ */
 export const contatti = {
   label: "Contatti",
-  title: "Scrivere al Giardino",
-  standfirst: "Per disponibilità e informazioni sui prodotti del Giardino.",
+  /** Plain on purpose: after eight chapters of register, the commercial
+      moment answers the reader's actual question in three words. */
+  title: "Come acquistare",
+  standfirst:
+    "Il Giardino delle Esperidi non vende online. Le referenze si richiedono direttamente all'azienda, oppure si acquistano di persona alle fiere.",
+
+  /** What happens after contact. Describes the exchange, promises nothing. */
+  percorso: [
+    {
+      n: "01",
+      title: "Scrivi o telefona",
+      body: "Indica quali referenze ti interessano e in che quantità.",
+    },
+    {
+      n: "02",
+      title: "Ricevi le disponibilità",
+      body: "L'azienda risponde con le disponibilità aggiornate e le modalità di acquisto.",
+    },
+    {
+      n: "03",
+      title: "Vi accordate",
+      body: "Quantità e modalità si definiscono direttamente con il Giardino.",
+    },
+  ],
+
+  /** Three distinct channels. The enquiry is primary — it is the real one. */
+  canali: [
+    {
+      id: "disponibilita",
+      label: "Richiesta disponibilità",
+      action: "Richiedi disponibilità",
+      note: "Messaggio già impostato con i campi da compilare.",
+      // Archivo: an action label is interactive text, never Bodoni (§3.6).
+      type: "t-lead",
+      href: `mailto:${company.email}?subject=${encodeURIComponent(
+        "Richiesta disponibilità",
+      )}&body=${encodeURIComponent(richiestaBody)}`,
+      primary: true,
+      external: false,
+    },
+    {
+      id: "telefono",
+      label: "Telefono",
+      action: "338 286 6127",
+      note: "Per parlare direttamente con l'azienda.",
+      // DM Mono owns numerals absolutely (§3.7.4). Bodoni is a defect here.
+      type: "t-num",
+      href: company.phoneHref,
+      primary: false,
+      external: false,
+    },
+    {
+      id: "email",
+      label: "Email",
+      action: company.email,
+      note: "Per domande, informazioni e collaborazioni.",
+      // Archivo, and it wraps: 43 characters of Bodoni at 32px broke the grid.
+      type: "t-lead",
+      href: `mailto:${company.email}`,
+      primary: false,
+      external: false,
+    },
+  ],
+
+  /** The in-person channel. No dates on record, and none are invented. */
+  fiere: {
+    label: "Di persona",
+    title: "Le fiere",
+    body: "Il Giardino porta le sue referenze alle fiere a cui partecipa: è l'occasione per vedere i prodotti e parlare direttamente con chi li coltiva.",
+    // Deliberately not "calendario in aggiornamento", which would imply a
+    // calendar exists somewhere. It simply is not published here.
+    note: "Il calendario non è ancora pubblicato su questo sito. Per sapere dove trovare il Giardino, scrivi o segui i canali social.",
+  },
+
+  /** Trust block: a real address, a real name, a real phone. */
+  recapiti: {
+    label: "Recapiti",
+    address: [company.name, company.kind, "12062 Cherasco (CN), Piemonte"],
+  },
+
   email: company.email,
   phoneDisplay: "338 286 6127",
   phoneHref: company.phoneHref,

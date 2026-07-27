@@ -545,6 +545,79 @@ test.describe("OTTO full experience", () => {
     expect(await page.locator(".product__index").first().innerText()).not.toMatch(/\/\s*\d/);
   });
 
+  test("offers three distinct conversion channels, none of them a shop", async ({ page }) => {
+    const canali = page.locator(".canale");
+    await expect(canali).toHaveCount(3);
+
+    // The real conversion: a structured enquiry, with the message already
+    // shaped so the reader never has to compose a cold email.
+    const primary = page.locator(".canale[data-primary] .canale__action");
+    await expect(primary).toHaveCount(1);
+    const enquiry = await primary.getAttribute("href");
+    expect(enquiry).toContain("mailto:");
+    expect(enquiry).toContain("subject=");
+    expect(enquiry).toContain("body=");
+    expect(decodeURIComponent(enquiry ?? "")).toContain("Quantità");
+
+    // A phone that actually dials, and a plain email for everything else.
+    await expect(page.locator('.canale__action[href^="tel:"]')).toHaveCount(1);
+    const mailtos = page.locator('.canale__action[href^="mailto:"]');
+    await expect(mailtos).toHaveCount(2);
+
+    // The company does not sell online. Nothing here may imitate one.
+    const text = (await page.locator("#contatti").innerText()).toLowerCase();
+    for (const banned of ["compra ora", "aggiungi al carrello", "carrello", "checkout", "€"]) {
+      expect(text, `"${banned}" must not appear`).not.toContain(banned);
+    }
+    // And it says so out loud, rather than leaving the reader to discover it.
+    expect(text).toContain("non vende online");
+  });
+
+  test("explains what happens after contact, and where to buy in person", async ({ page }) => {
+    // The reader's real question before writing is "and then what?".
+    const steps = page.locator(".percorso");
+    expect(await steps.count()).toBeGreaterThanOrEqual(3);
+    for (let i = 0; i < (await steps.count()); i += 1) {
+      await expect(steps.nth(i).locator(".percorso__title")).not.toBeEmpty();
+      await expect(steps.nth(i).locator(".percorso__body")).not.toBeEmpty();
+    }
+
+    // Fairs are a genuine route to purchase for this business, not a footnote.
+    const fiere = page.locator(".contact__fiere");
+    await expect(fiere).toHaveCount(1);
+    await expect(fiere).toContainText("fiere");
+
+    // No fair dates are on record, so none may be stated.
+    const text = (await fiere.innerText()).toLowerCase();
+    expect(text).not.toMatch(/\b20\d\d\b/);
+    expect(text).not.toMatch(
+      /\b(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\b/,
+    );
+
+    // Trust: a real name, a real place, a real way to check who you are dealing with.
+    const contatti = page.locator("#contatti");
+    await expect(contatti).toContainText("Cherasco");
+    await expect(contatti).toContainText("Azienda agricola");
+    await expect(contatti.locator('a[href*="privacy"]')).toHaveCount(1);
+  });
+
+  test("states no delivery, turnaround or stock promise anywhere", async ({ page }) => {
+    // None of these are on record. A plausible-sounding invented one is a
+    // commercial promise the client would have to honour.
+    const text = (await page.locator("#contatti").innerText()).toLowerCase();
+    for (const banned of [
+      "spedizion",
+      "spediamo",
+      "consegna in",
+      "entro 24",
+      "entro 48",
+      "risposta immediata",
+      "sempre disponibil",
+    ]) {
+      expect(text, `"${banned}" is not on record`).not.toContain(banned);
+    }
+  });
+
   test("runs without client exceptions or console errors", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
