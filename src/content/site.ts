@@ -16,7 +16,7 @@
  *   · `senza glutine` must never appear.
  */
 
-import { company, products } from "./facts";
+import { company, origins, products } from "./facts";
 
 export interface DataRow {
   label: string;
@@ -150,7 +150,7 @@ export const chapters: readonly Chapter[] = [
     standfirst: "Macinata a pietra. Integrale.",
     body: [
       "La Farina di Mais Rosso è integrale e macinata a pietra.",
-      "Dalla stessa varietà nascono tre referenze: farina, gallette e grissini.",
+      "Dalla stessa varietà nascono farina, gallette e grissini.",
     ],
     data: [
       { label: "Molitura", value: "a pietra" },
@@ -164,11 +164,17 @@ export const chapters: readonly Chapter[] = [
   {
     n: "07",
     id: "referenze",
-    title: "Tre referenze",
-    standfirst: "Tre referenze dal Mais Rosso Ottofile.",
-    body: ["Non una gamma. Tre."],
+    // Count-free, and it keeps the noun-phrase pattern of every other chapter.
+    // Also the longest single word (REFERENZE) still fits the mobile column at
+    // --type-d2 40px: "TRASFORMAZIONI" did not, and overflowed the document.
+    title: "Le referenze",
+    standfirst: "Una terra sola. Una materia prima principale. Lavorazioni diverse.",
+    body: [
+      "Il Mais Rosso Ottofile è la materia prima principale del Giardino, non l'unica: l'orto botanico aziendale dà le erbe dell'Amaro. Ogni scheda dichiara da che cosa nasce.",
+      "Il catalogo è aperto. Alcune schede sono ancora in preparazione.",
+    ],
     data: [],
-    railFact: "Maisette · Maissini · Farina di Mais Rosso",
+    railFact: "le lavorazioni del Giardino, dal mais all'orto botanico",
   },
   {
     n: "08",
@@ -181,36 +187,48 @@ export const chapters: readonly Chapter[] = [
   },
 ] as const;
 
-/** Chapter 07 product cards, joined to the verified factual record. */
+/**
+ * Chapter 07 register entries, joined to the verified factual record.
+ *
+ * Derived entirely from `products` — adding a product to facts.ts adds it here
+ * and to the rendered register with no other change. Nothing in this file may
+ * depend on how many entries there are.
+ */
 export const referenze = products.map((p, i) => ({
   ...p,
+  /** Ordinal only. NEVER "01/03" — the total is not part of the concept. */
   index: String(i + 1).padStart(2, "0"),
-  note:
-    p.id === "maisette"
-      ? "Gallette di Mais Rosso Ottofile Integrale, 120 g."
-      : p.id === "maissini"
-        ? "Grissini di mais prodotti con farina di Mais Rosso Ottofile."
-        : "Ottofile Integrale varietà Albese, macinata a pietra, 500 g.",
-  // Only the flour carries the polenta note.
+  originLabel: origins[p.origin],
+  /** Only the flour carries the polenta note — it is the only one on record. */
   extra:
     p.id === "farina"
       ? "Per polenta: tradizionale, minimo 60 minuti di cottura, oppure col Bimby."
       : null,
+  /**
+   * Pre-addressed enquiry, so the reader never composes a cold email.
+   * Built from `company.email` rather than `cta.href`: `cta` is declared
+   * further down this module and referencing it here would be a TDZ error.
+   */
+  href: `mailto:${company.email}?subject=${encodeURIComponent(
+    `Richiesta disponibilità — ${p.name}`,
+  )}`,
 }));
 
-/**
- * Amaro del Dottore — annex, outside the register.
- *
- * NOTE: the client's own wording is "coltivate con agricoltura biologica e
- * simbiotica". `biologico` is protected under EU Reg. 2018/848 and requires
- * certification plus a control-body code. No certification is on record, so we
- * ship the certification-free wording. Restore `biologica` only on written
- * client confirmation. See docs/content-plan.md §8.2.
- */
-export const allegato = {
-  label: "Allegato · fuori registro",
-  name: "Amaro del Dottore",
-  body: "Fuori dal mais. Prodotto con le erbe officinali dell'orto botanico aziendale, coltivate con agricoltura simbiotica.",
+/** Labels for the register. Status is about the RECORD, not the product. */
+export const catalogo = {
+  entryLabel: "Referenza",
+  originLabel: "Origine",
+  formatLabel: "Peso netto",
+  /** Rendered where no verified description exists. Never a fabricated one. */
+  inPreparazione: "Scheda in preparazione.",
+  status: {
+    completo: null,
+    parziale: "Scheda parziale",
+    // No badge: the description slot already reads "Scheda in preparazione.",
+    // and the dashed rule marks the row. Printing it twice, 90px apart, just
+    // looked like a bug.
+    "in-preparazione": null,
+  },
 } as const;
 
 /** Chapter 08 — the single chromatic event. */
@@ -234,7 +252,7 @@ export const cta = {
 export const contatti = {
   label: "Contatti",
   title: "Scrivere al Giardino",
-  standfirst: "Per disponibilità e informazioni sulle tre referenze.",
+  standfirst: "Per disponibilità e informazioni sui prodotti del Giardino.",
   email: company.email,
   phoneDisplay: "338 286 6127",
   phoneHref: company.phoneHref,

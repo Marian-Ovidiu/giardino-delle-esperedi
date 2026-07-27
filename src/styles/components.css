@@ -301,7 +301,16 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   font-style: normal;
 }
 
+/* The clipping WINDOW, not the text. It must never exceed the field, or the
+   document itself becomes horizontally scrollable — which is what was
+   happening at 390px (scrollWidth 409 vs clientWidth 390). The child below
+   carries `max-content` and is clipped by this box: that is what "clipped by
+   the right edge" means, and it is the only correct way to express it. */
 .hero__title-line--wide {
+  width: 100%;
+}
+
+.hero__title-line--wide > span {
   width: max-content;
   white-space: nowrap;
 }
@@ -807,8 +816,9 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 /* 07 — three unequal records, never cards */
 
 .chapter--products {
-  min-height: 168svh;
-  grid-template-rows: auto auto auto auto;
+  /* Height is content-driven. A fixed min-height would have to be revised
+     every time a product is added — the section must absorb growth silently. */
+  grid-template-rows: auto auto auto;
 }
 
 .chapter--products__head {
@@ -835,36 +845,36 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   border-right: 0;
 }
 
+/* — the register of transformations ————————————————————————————
+   Uniform rows, one per entry, so entries are comparable at a glance and the
+   list absorbs a sixth product without a layout change. Column 8 stays void. */
+
 .products {
   grid-column: 1 / 8;
   grid-row: 3;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  column-gap: var(--gutter);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
   padding: 0;
-  margin: var(--space-21) 0 0;
+  margin: var(--space-13) 0 0;
   list-style: none;
 }
 
 .product {
-  min-height: 560px;
-  padding-top: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: var(--gutter);
+  align-items: start;
+  padding-block: var(--space-8);
   border-top: 1px solid var(--rigo-forte);
 }
 
-.product--maisette {
-  grid-column: 1 / 4;
+.product:last-child {
+  border-bottom: 1px solid var(--rigo-forte);
 }
 
-.product--maissini {
-  grid-column: 4 / 6;
-  margin-top: var(--space-13);
-}
-
-.product--farina {
-  grid-column: 6 / 8;
-  margin-top: var(--space-21);
+.product__index {
+  grid-column: 1 / 2;
+  grid-row: 1;
 }
 
 .product__index span {
@@ -872,44 +882,79 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   color: var(--testo-2);
 }
 
-.product__name {
-  margin-top: var(--space-5);
+.product__identity {
+  grid-column: 2 / 5;
+  grid-row: 1;
 }
 
-.product__definition,
-.product__format,
-.product__extra {
-  margin-top: var(--space-5);
-}
-
-.product__format {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--space-2);
-  padding-block: var(--space-1);
-  border-block: 1px solid var(--rigo);
-}
-
-.product__format dd {
+.product__data {
+  grid-column: 5 / 8;
+  grid-row: 1;
   margin: 0;
+}
+
+.product__foot {
+  grid-column: 2 / 5;
+  grid-row: 2;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.product__name {
+  margin-bottom: var(--space-3);
+}
+
+.product__definition {
+  margin-bottom: var(--space-2);
 }
 
 .product__extra {
   color: var(--testo-2);
 }
 
-.chapter--products__cta {
-  grid-column: 5 / 8;
-  grid-row: 4;
-  justify-self: start;
+.product__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  padding-block: var(--space-1);
+  border-bottom: 1px solid var(--rigo);
+}
+
+.product__row:first-child {
+  border-top: 1px solid var(--rigo);
+}
+
+.product__data dt {
+  color: var(--testo-2);
+}
+
+.product__data dd {
+  margin: 0;
+}
+
+.product__status {
+  color: var(--testo-2);
+}
+
+.product__cta {
   display: inline-flex;
-  min-width: 40px;
   min-height: 40px;
-  padding-inline: var(--space-1);
   align-items: center;
-  margin-top: var(--space-13);
-  padding-bottom: var(--space-1);
-  border-bottom: 1px solid var(--indice);
+}
+
+/* Records with nothing verified read as reserved slots, not as products.
+   Dashed rather than solid: a register marks a provisional entry, it does not
+   pretend the entry is complete. The colour stays --rigo — an --indice rule
+   here would turn the index colour into a state colour. */
+.product[data-status="in-preparazione"] {
+  border-top-style: dashed;
+}
+
+.product[data-status="in-preparazione"] .product__name,
+.product__definition--vuota {
+  color: var(--testo-2);
 }
 
 /* 08 — the one chromatic event */
@@ -1188,8 +1233,24 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
     grid-column: 3 / 8;
   }
 
-  .product {
-    min-height: 480px;
+  /* Tablet: data drops below identity rather than crushing the measure. */
+  .product__index {
+    grid-column: 1 / 2;
+  }
+
+  .product__identity {
+    grid-column: 2 / 8;
+  }
+
+  .product__data {
+    grid-column: 2 / 8;
+    grid-row: 2;
+    margin-top: var(--space-5);
+  }
+
+  .product__foot {
+    grid-column: 2 / 8;
+    grid-row: 3;
   }
 
   .chapter--custody__title {
@@ -1251,8 +1312,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   .chapter--stone__data,
   .chapter--products__head,
   .chapter--products__matrix,
-  .products,
-  .chapter--products__cta {
+  .products {
     grid-column: 1 / 8;
     grid-row: auto;
   }
@@ -1339,22 +1399,40 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .products {
-    display: block;
-    margin-top: var(--space-13);
+    margin-top: var(--space-8);
   }
 
+  /* Mobile: one column. Height is content-driven — a fixed min-height would
+     leave a placeholder row mostly empty. */
   .product {
-    min-height: 88svh;
+    grid-template-columns: 1fr;
+    padding-block: var(--space-5);
   }
 
-  .product + .product,
-  .product--maissini,
-  .product--farina {
-    margin-top: var(--space-13);
+  .product__index,
+  .product__identity,
+  .product__data,
+  .product__foot {
+    grid-column: 1 / 2;
+    grid-row: auto;
   }
 
-  .chapter--products__cta {
-    margin-top: var(--space-13);
+  .product__index {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .product__data {
+    margin-top: var(--space-3);
+  }
+
+  .product__foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
   }
 
   .chapter--custody {

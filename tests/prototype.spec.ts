@@ -128,7 +128,22 @@ test.describe("OTTO full experience", () => {
     await expect(page.locator(".rail__kernel")).toHaveCount(64);
     await expect(page.locator(".pin-spacer")).toHaveCount(0);
 
-    await page.locator("#custodia").scrollIntoViewIfNeeded();
+    // Reaching chapter 08 must NOT by itself flip the field. In reduced motion
+    // the inversion stays driven by kernel 64, exactly as it is with motion on.
+    // Firing on section entry — which is what shipped before — puts the page on
+    // --notte while chapter 07 still fills the screen, where --pietra-testo
+    // renders at 2.99:1 and fails WCAG AA, and jumps kernels 57–64 in one step.
+    await page.evaluate(() => {
+      const section = document.querySelector("#custodia");
+      if (section) window.scrollTo(0, section.getBoundingClientRect().top + window.scrollY);
+    });
+    await page.waitForTimeout(320);
+    await expect(page.locator("html")).toHaveAttribute("data-field", "giorno");
+    await expect(page.locator(".rail__kernel").last()).toHaveAttribute("data-state", "pending");
+
+    // Scrolling THROUGH it fills the count, and the inversion follows kernel 64.
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(320);
     await expect(page.locator(".rail__kernel").last()).toHaveAttribute("data-state", "completed");
     await expect(page.locator("html")).toHaveAttribute("data-field", "notte");
   });
@@ -482,16 +497,52 @@ test.describe("OTTO full experience", () => {
     }
   });
 
-  test("uses the current commercial product hierarchy", async ({ page }) => {
+  test("presents products without depending on how many there are", async ({ page }) => {
     const products = page.locator(".product");
-    await expect(products).toHaveCount(3);
-    await expect(products.nth(0)).toContainText("Maisette");
-    await expect(products.nth(0)).toContainText("120 g");
-    await expect(products.nth(1)).toContainText("Maissini");
-    await expect(products.nth(1)).toContainText("Grissini di mais");
-    await expect(products.nth(1).getByText("Peso netto")).toHaveCount(0);
-    await expect(products.nth(2)).toContainText("Farina di Mais Rosso");
-    await expect(products.nth(2)).toContainText("500 g");
+
+    // Deliberately NOT toHaveCount(n). The previous assertion hard-coded three
+    // and shipped alongside the copy "Non una gamma. Tre." — which was false:
+    // the real catalogue also includes Birra and Amaro del Dottore. The
+    // section must absorb a new product with no code change, so the test may
+    // not re-introduce the assumption it exists to prevent.
+    const count = await products.count();
+    expect(count).toBeGreaterThanOrEqual(5);
+
+    // Every entry, whatever the total, carries a name and a way to enquire.
+    for (let i = 0; i < count; i += 1) {
+      const entry = products.nth(i);
+      await expect(entry.locator(".product__name")).not.toBeEmpty();
+      await expect(entry.locator(".product__cta")).toHaveCount(1);
+      await expect(entry.locator(".product__data dd").first()).not.toBeEmpty();
+    }
+
+    // Verified facts appear exactly where they are on record.
+    const byName = (name: string) => products.filter({ hasText: name }).first();
+    await expect(byName("Maisette")).toContainText("120 g");
+    await expect(byName("Farina di Mais Rosso")).toContainText("500 g");
+    await expect(byName("Maissini")).toContainText("Grissini di mais");
+
+    // Maissini has no client-confirmed net weight: the row is omitted, never
+    // dashed and never invented.
+    await expect(byName("Maissini").getByText("Peso netto")).toHaveCount(0);
+
+    // Products with no verified record are reserved slots, not omissions, and
+    // must not be padded out with invented copy.
+    const birra = products.filter({ hasText: "Birra" }).first();
+    await expect(birra).toHaveAttribute("data-status", "in-preparazione");
+    await expect(birra).toContainText("Scheda in preparazione");
+    await expect(birra.locator(".product__cta")).toHaveCount(1);
+
+    // Not every product descends from the maize — asserting so would be false.
+    await expect(byName("Amaro del Dottore")).toContainText("Orto botanico");
+  });
+
+  test("carries no copy that hard-codes the size of the range", async ({ page }) => {
+    const text = (await page.locator("main").innerText()).toLowerCase();
+    expect(text).not.toContain("non una gamma");
+    expect(text).not.toContain("tre referenze");
+    // Ordinals are fine; "01/03" would pin the layout to a fixed total.
+    expect(await page.locator(".product__index").first().innerText()).not.toMatch(/\/\s*\d/);
   });
 
   test("runs without client exceptions or console errors", async ({ page }) => {

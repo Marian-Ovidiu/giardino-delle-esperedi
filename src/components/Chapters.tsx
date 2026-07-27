@@ -1,6 +1,6 @@
 import { RegistroDati } from "@/components/RegistroDati";
 import { StaticProloguePlate } from "@/components/StaticProloguePlate";
-import { chapters, cta, custodia, referenze } from "@/content/site";
+import { catalogo, chapters, cta, custodia, referenze } from "@/content/site";
 
 function ChapterHead({ index }: { index: number }) {
   const chapter = chapters[index];
@@ -198,28 +198,65 @@ export function ProductsChapter() {
           </span>
         ))}
       </div>
+      {/*
+        One row per entry, driven entirely by `referenze`. Rows are uniform and
+        comparable — the previous diagonal stagger made three products
+        impossible to scan side by side and could not absorb a fourth.
+        Adding a product to facts.ts is the only step needed to extend this.
+      */}
       <ol className="products">
         {referenze.map((product) => (
-          <li className={`product product--${product.id}`} key={product.id}>
+          <li
+            className="product"
+            key={product.id}
+            data-product={product.id}
+            data-status={product.status}
+          >
             <p className="product__index">
-              <span className="t-label">Referenza</span>
-              <span className="t-num">{product.index}/03</span>
+              <span className="t-label">{catalogo.entryLabel}</span>
+              {/* Ordinal only — no total. The count is not part of the concept. */}
+              <span className="t-num">{product.index}</span>
             </p>
-            <h3 className="product__name t-d3">{product.name}</h3>
-            <p className="product__definition t-body">{product.definition}</p>
-            {product.format && (
-              <dl className="product__format">
-                <dt className="t-label">Peso netto</dt>
-                <dd className="t-data-lg">{product.format}</dd>
-              </dl>
-            )}
-            {product.extra && <p className="product__extra t-small">{product.extra}</p>}
+
+            <div className="product__identity">
+              <h3 className="product__name t-d3">{product.name}</h3>
+              {product.definition ? (
+                <p className="product__definition t-body">{product.definition}</p>
+              ) : (
+                /* No verified description exists. We say so rather than
+                   inventing one or hiding the product. */
+                <p className="product__definition product__definition--vuota t-body">
+                  {catalogo.inPreparazione}
+                </p>
+              )}
+              {product.extra && <p className="product__extra t-small">{product.extra}</p>}
+            </div>
+
+            <dl className="product__data">
+              <div className="product__row">
+                <dt className="t-label">{catalogo.originLabel}</dt>
+                <dd className="t-data-lg">{product.originLabel}</dd>
+              </div>
+              {product.format && (
+                <div className="product__row">
+                  <dt className="t-label">{catalogo.formatLabel}</dt>
+                  <dd className="t-data-lg">{product.format}</dd>
+                </div>
+              )}
+            </dl>
+
+            <div className="product__foot">
+              {catalogo.status[product.status] && (
+                <p className="product__status t-label">{catalogo.status[product.status]}</p>
+              )}
+              <a className="product__cta t-label-lg" href={product.href}>
+                {cta.label}
+                <span className="sr-only"> — {product.name}</span>
+              </a>
+            </div>
           </li>
         ))}
       </ol>
-      <a className="chapter--products__cta t-label-lg" href={cta.href}>
-        {cta.label}
-      </a>
     </section>
   );
 }

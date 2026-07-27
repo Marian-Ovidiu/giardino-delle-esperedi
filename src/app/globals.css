@@ -112,7 +112,7 @@ a {
 .contact__phone,
 .contact__social a,
 .contact__legal a,
-.chapter--products__cta {
+.product__cta {
   text-decoration: underline;
   text-decoration-color: var(--rigo);
   text-decoration-thickness: 1px;
@@ -125,7 +125,7 @@ a {
   .contact__phone:hover,
   .contact__social a:hover,
   .contact__legal a:hover,
-  .chapter--products__cta:hover {
+  .product__cta:hover {
     text-decoration-color: var(--indice);
     transition-duration: var(--dur-1);
     transition-timing-function: var(--ease-registro);

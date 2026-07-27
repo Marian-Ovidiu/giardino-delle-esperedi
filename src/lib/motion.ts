@@ -109,7 +109,10 @@ let registered = false;
  * Mirror the CSS easing curves into GSAP. Idempotent — safe to call from any
  * component that needs them.
  */
-export function registerEases(gsap: typeof gsapType, CustomEase: { create: (n: string, d: string) => unknown }) {
+export function registerEases(
+  gsap: typeof gsapType,
+  CustomEase: { create: (n: string, d: string) => unknown },
+) {
   if (registered) return;
   for (const [name, points] of Object.entries(EASE_POINTS)) {
     CustomEase.create(name, points);
