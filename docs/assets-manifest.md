@@ -24,6 +24,49 @@
 
 The complete, verbatim generation prompts live in `docs/asset-plan.md` §6 and in the versioned scripts named below. This manifest records every generated candidate, including rejections, so a rejected frame cannot silently return to the layout.
 
+## Piastre provvisorie — 2026-07-27
+
+Six editorial **material studies** standing in until the company's own
+photography is available. They are narrative, not documentary: none depicts a
+person, this company's land, its equipment, a process it performs, or a
+historical document, and none may be captioned as if it did.
+
+Registered in `src/content/media.ts` with `status: "provvisorio"`, which renders
+an `IMMAGINE PROVVISORIA` annotation in the interface. Replacing one is an edit
+to that file and nothing else — no component, no CSS, no layout, no copy.
+
+Generated on `nano_banana_pro`, 2k, 3:2, with `assets/refs/REF-CARTA.png` as
+image reference so the set shares one palette and one light. Cropped to the
+art direction's 8:5 and encoded by `scripts/build-piastre.mjs`.
+**Cost: 12.00 credits (6 × 2.00). Zero rejections.**
+
+| Filename | Section | Depicts | Caption | Dimensions | Format | Status |
+|---|---|---|---|---:|---|---|
+| `public/images/generated/piastre/re-materia.avif` | ch02 · Il mais del Re | Dry husk bracts on pale paper | *Brattee secche.* | 1600×1000 | AVIF, 182 KB | `PROVVISORIO` |
+| `public/images/generated/piastre/atmosfera-luce.avif` | ch04 · Quasi estinto | Dust in raking light, abstract | — (decorative, `alt=""`) | 1600×1000 | AVIF, 46 KB | `PROVVISORIO` |
+| `public/images/generated/piastre/campo-terra.avif` | ch05 · Il campo | Dry ploughed clods, no horizon | *Terra.* | 1600×1000 | AVIF, 178 KB | `PROVVISORIO` |
+| `public/images/generated/piastre/campo-coltura.avif` | ch05 · Il campo | Dry stalks and chaff, no horizon | *Steli.* | 1600×1000 | AVIF, 86 KB | `PROVVISORIO` |
+| `public/images/generated/piastre/pietra-macina.avif` | ch06 · La pietra | Millstone surface, radial grooves | *Pietra.* | 1600×1000 | AVIF, 156 KB | `PROVVISORIO` |
+| `public/images/generated/piastre/pietra-farina.avif` | ch06 · La pietra | Macro of coarse cornmeal | *Farina.* | 1600×1000 | AVIF, 99 KB | `PROVVISORIO` |
+
+**Prompts** are versioned verbatim in `scripts/generate-piastre.zsh`. Masters and
+job payloads are in `assets/masters/piastre/` (gitignored).
+
+**Rulings made during review**
+
+- **No historical visual for ch02.** A generated period document or portrait is
+  forbidden, so the chapter receives a dry material study instead. The age of
+  the variety is carried by the material, not by a depicted event.
+- **`pietra-farina` was recaptioned** from *"Farina, macinata a pietra."* to
+  *"Farina."* — the original attached a verified process to a generic
+  provisional plate, which is precisely what these images may not do.
+- Captions name the material and stop. Alt text describes what is visible and
+  never a place, an owner, a person or a process. A test enforces this.
+
+**Balance after this batch: 165.05 credits.**
+
+---
+
 ## Approved assets
 
 | Filename | Source | Purpose | Generation prompt | Dimensions | Format | Approval status | Usage location |

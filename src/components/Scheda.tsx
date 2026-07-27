@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Chapter } from "@/content/site";
 import { RegistroDati } from "./RegistroDati";
+import { Piastra } from "./Piastra";
 import { StaticProloguePlate } from "./StaticProloguePlate";
 
 /**
@@ -19,7 +20,12 @@ export function Scheda({ chapter, children }: { chapter: Chapter; children?: Rea
       data-scheda={chapter.n}
       aria-labelledby={`t-${chapter.id}`}
     >
-      {chapter.n === "01" && <StaticProloguePlate state="plant" />}
+      {chapter.n === "01" && (
+        <>
+          <Piastra slot="varieta-campitura" variant="campitura" />
+          <StaticProloguePlate state="plant" />
+        </>
+      )}
       <div className="scheda__testo">
         <p className="t-data scheda__etichetta">Scheda {chapter.n}/08</p>
 

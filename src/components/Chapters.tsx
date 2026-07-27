@@ -42,11 +42,7 @@ export function RoyalChapter() {
       <div className="chapter--royal__data">
         <RegistroDati rows={chapter.data} />
       </div>
-      <Piastra
-        slot="re-materia"
-        className="chapter--royal__piastra"
-        sizes="(max-width: 767px) 100vw, 40vw"
-      />
+      <Piastra slot="re-materia" variant="lastra" className="chapter--royal__lastra" />
     </section>
   );
 }
@@ -112,10 +108,18 @@ export function ConservationChapter() {
       <div className="chapter--conservation__data">
         <RegistroDati rows={chapter.data} />
       </div>
+      {/* The square below 768px is forbidden (§8.5), so mobile receives the
+          same subject at the permitted 8:5 rather than receiving nothing. Each
+          is hidden at the other breakpoint; neither is fetched when hidden. */}
       <Piastra
-        slot="atmosfera-luce"
-        className="chapter--conservation__piastra"
-        sizes="(max-width: 767px) 100vw, 30vw"
+        slot="quasi-estinto-reperto"
+        variant="reperto"
+        className="chapter--conservation__reperto"
+      />
+      <Piastra
+        slot="quasi-estinto-mobile"
+        variant="lastra"
+        className="chapter--conservation__mobile"
       />
     </section>
   );
@@ -143,10 +147,7 @@ export function FieldChapter() {
           </p>
         ))}
       </div>
-      <div className="chapter--field__piastre">
-        <Piastra slot="campo-terra" sizes="(max-width: 767px) 100vw, 36vw" />
-        <Piastra slot="campo-coltura" sizes="(max-width: 767px) 100vw, 36vw" />
-      </div>
+      <Piastra slot="campo-coltura" variant="lastra" className="chapter--field__lastra" />
       <p className="chapter--field__chain t-data" aria-label="Filiera aziendale">
         Semina <span aria-hidden="true">→</span> raccolta <span aria-hidden="true">→</span>{" "}
         trasformazione
@@ -164,6 +165,7 @@ export function StoneChapter() {
       data-scheda={chapter.n}
       aria-labelledby={`t-${chapter.id}`}
     >
+      <Piastra slot="pietra-campitura" variant="campitura" />
       <div className="chapter--stone__head">
         <ChapterHead index={5} />
       </div>
@@ -190,10 +192,7 @@ export function StoneChapter() {
       <div className="chapter--stone__data">
         <RegistroDati rows={chapter.data} />
       </div>
-      <div className="chapter--stone__piastre">
-        <Piastra slot="pietra-macina" sizes="(max-width: 767px) 100vw, 36vw" />
-        <Piastra slot="pietra-farina" sizes="(max-width: 767px) 100vw, 36vw" />
-      </div>
+      <Piastra slot="pietra-farina" variant="lastra" className="chapter--stone__oggetto" />
     </section>
   );
 }
@@ -210,6 +209,7 @@ export function ProductsChapter() {
       <div className="chapter--products__head">
         <ChapterHead index={6} />
       </div>
+      <Piastra slot="referenze-collettiva" variant="lastra" className="chapter--products__lastra" />
       <div className="chapter--products__matrix" aria-label="Matrice varietale: otto file">
         {Array.from({ length: 8 }, (_, index) => (
           <span className="t-data" key={index}>

@@ -142,10 +142,17 @@ export function KernelPrologue({ previewProgress }: KernelPrologueProps) {
       const snapshot = renderer.snapshot();
       section.dataset.stage = snapshot.stage;
       section.style.setProperty("--prologue-progress", snapshot.progress.toFixed(4));
-      section.style.setProperty(
-        "--prologue-opacity",
-        (stageOpacity(snapshot.progress) * clamp(releaseVisibility)).toFixed(4),
-      );
+
+      /*
+       * Snap a fully-released layer to exactly 0.
+       *
+       * Sub-pixel scroll positions leave the release factor a fraction short of
+       * 1, which lands the layer on 0.0001 — invisible, but non-zero, so the
+       * compositor keeps the WebGL surface alive after the prologue has
+       * finished. "Released" has to mean released.
+       */
+      const opacity = stageOpacity(snapshot.progress) * clamp(releaseVisibility);
+      section.style.setProperty("--prologue-opacity", opacity < 0.001 ? "0" : opacity.toFixed(4));
       const pointerIsGated =
         (snapshot.progress >= 0.34 && snapshot.progress <= 0.44) || snapshot.progress >= 0.76;
       if (pointerIsGated) {

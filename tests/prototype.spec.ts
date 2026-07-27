@@ -730,27 +730,36 @@ test.describe("OTTO full experience", () => {
 
     // Plates are lazy. They must be brought into view first, or this measures
     // lazy-loading rather than whether the files actually resolve.
-    const images = page.locator(".piastra__img");
+    // Only visible plates: 1:1 detail plates are dropped on mobile (§8.5), and
+    // scrolling to a display:none element throws.
+    const images = page.locator(".piastra__img:visible");
     const total = await images.count();
     for (let i = 0; i < total; i += 1) {
       await images.nth(i).scrollIntoViewIfNeeded();
     }
     await page.waitForFunction(
       () =>
-        Array.from(document.querySelectorAll<HTMLImageElement>(".piastra__img")).every(
-          (img) => img.complete,
-        ),
+        Array.from(document.querySelectorAll<HTMLImageElement>(".piastra__img"))
+          .filter((img) => img.offsetParent !== null)
+          .every((img) => img.complete),
       undefined,
       { timeout: 15_000 },
     );
 
     // Every plate actually resolves — a 404 renders as an empty box, which
     // reads as a broken layout rather than as a missing asset.
-    const broken = await images.evaluateAll((nodes) =>
-      nodes
-        .filter((img) => !(img instanceof HTMLImageElement) || img.naturalWidth === 0)
-        .map((img) => (img as HTMLImageElement).getAttribute("src")),
-    );
+    const broken = await page
+      .locator(".piastra__img")
+      .evaluateAll((nodes) =>
+        nodes
+          .filter(
+            (img) =>
+              img instanceof HTMLImageElement &&
+              img.offsetParent !== null &&
+              img.naturalWidth === 0,
+          )
+          .map((img) => (img as HTMLImageElement).getAttribute("src")),
+      );
     expect(broken).toEqual([]);
   });
 
@@ -800,18 +809,74 @@ test.describe("OTTO full experience", () => {
     }
   });
 
-  test("reserves identical space whatever a plate's status", async ({ page }) => {
-    // The box is fixed by aspect-ratio, so swapping a provisional plate for
-    // the definitive photograph cannot move the layout.
-    const ratios = await page.locator(".piastra__frame").evaluateAll((frames) =>
-      frames.map((f) => {
+  test("renders each plate at its own declared ratio", async ({ page }) => {
+    // The box is fixed by aspect-ratio, so swapping a provisional plate for the
+    // definitive photograph cannot move the layout. Two ratios exist and a
+    // third is a defect (art-direction §8): 8:5 for landscape plates, 1:1 for
+    // detail plates. This asserts each variant against ITS ratio — an earlier
+    // version demanded 8:5 of everything, which would have blocked the square.
+    const frames = await page.locator(".piastra__frame").evaluateAll((nodes) =>
+      nodes.map((f) => {
         const r = f.getBoundingClientRect();
-        return r.height === 0 ? 0 : Number((r.width / r.height).toFixed(2));
+        const figure = f.closest(".piastra");
+        const variant = figure?.classList.contains("piastra--reperto") ? "reperto" : "lastra";
+        return { variant, ratio: r.height === 0 ? 0 : Number((r.width / r.height).toFixed(2)) };
       }),
     );
-    expect(ratios.length).toBeGreaterThan(0);
-    for (const ratio of ratios) {
-      expect(ratio).toBeCloseTo(1.6, 1); // 8:5
+
+    const visible = frames.filter((f) => f.ratio > 0);
+    expect(visible.length).toBeGreaterThan(0);
+    for (const frame of visible) {
+      expect(frame.ratio).toBeCloseTo(frame.variant === "reperto" ? 1 : 1.6, 1);
+    }
+  });
+
+  test("bleeds no plate further than the art direction permits", async ({ page }) => {
+    // §7.4.1: at most 20% of an image's width may leave the right edge, and
+    // only in chapters 02, 05 and 07. A bleed must also never become a
+    // horizontal scrollbar.
+    const bleeds = await page.locator(".piastra--lastra").evaluateAll((nodes) =>
+      nodes.map((el) => {
+        const r = el.getBoundingClientRect();
+        const off = Math.max(0, r.right - document.documentElement.clientWidth);
+        return {
+          section: el.closest("section")?.id ?? "?",
+          fraction: r.width === 0 ? 0 : Number((off / r.width).toFixed(3)),
+        };
+      }),
+    );
+
+    const permitted = new Set(["mais-del-re", "il-campo", "referenze"]);
+    for (const bleed of bleeds) {
+      expect(bleed.fraction, `${bleed.section} bleeds too far`).toBeLessThanOrEqual(0.2);
+      if (bleed.fraction > 0) {
+        expect(permitted.has(bleed.section), `${bleed.section} may not bleed`).toBe(true);
+      }
+    }
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+
+  test("keeps text legible over every campitura", async ({ page }) => {
+    // A ground is decorative and must never be announced, and it must never
+    // eat the contrast margin of the text printed on it. --pietra-testo sits
+    // at 5.15:1 on bare --carta; the grounds were measured and their opacity
+    // set from that measurement, not chosen by eye.
+    const grounds = page.locator(".piastra--campitura");
+    const count = await grounds.count();
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i += 1) {
+      await expect(grounds.nth(i)).toHaveAttribute("aria-hidden", "true");
+      await expect(grounds.nth(i).locator("figcaption")).toHaveCount(0);
+      const opacity = await grounds
+        .nth(i)
+        .locator(".piastra__img")
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
+      expect(opacity).toBeLessThanOrEqual(0.08);
     }
   });
 

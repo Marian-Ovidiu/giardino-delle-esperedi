@@ -14,15 +14,45 @@
  * Usage: node scripts/build-piastre.mjs
  */
 import sharp from "sharp";
-import { readdir, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const SRC = path.join("assets", "masters", "piastre");
 const OUT = path.join("public", "images", "generated", "piastre");
 
-/** 8:5, matching the declared intrinsic size in src/content/media.ts. */
-const WIDTH = 1600;
-const HEIGHT = 1000;
+/**
+ * Every derivative is written at the ratio it will be DISPLAYED at.
+ *
+ * art-direction §8.4: "Frames are never cropped further in CSS to a new ratio.
+ * `object-fit: cover` with a non-native aspect box is a defect." So a square
+ * plate is a real 1:1 file cut from the master, never an 8:5 file squeezed
+ * into a square box.
+ *
+ * `--derivati <name>` limits the run to one plate; without it everything is
+ * rebuilt.
+ */
+const RATIOS = {
+  /** 8:5 — the default landscape plate (LASTRA and objects). */
+  lastra: { w: 1600, h: 1000, suffix: "" },
+  /** 1:1 — detail plates (REPERTO). Desktop and tablet only (§8.5). */
+  reperto: { w: 1200, h: 1200, suffix: "-1x1" },
+  /** Wide cover for full-section grounds (CAMPITURA). */
+  campitura: { w: 2000, h: 1250, suffix: "-cover" },
+};
+
+/**
+ * Which derivatives each master needs. Adding a ratio here is the only step
+ * required to produce it — the paths are then registered in media.ts.
+ */
+const PLAN = {
+  "re-materia": ["lastra"],
+  "atmosfera-luce": ["lastra", "reperto"],
+  "campo-terra": ["lastra", "campitura"],
+  "campo-coltura": ["lastra"],
+  "pietra-macina": ["lastra", "campitura"],
+  "pietra-farina": ["lastra"],
+  "referenze-collettiva": ["lastra"],
+};
 
 /** Pull the first image URL out of an arbitrarily shaped job payload. */
 function findImageUrl(node) {
@@ -55,52 +85,63 @@ function findImageUrl(node) {
 await mkdir(SRC, { recursive: true });
 await mkdir(OUT, { recursive: true });
 
-const jobs = (await readdir(SRC)).filter((f) => f.endsWith(".json"));
-if (jobs.length === 0) {
-  console.error(`No job files in ${SRC}. Run scripts/generate-piastre.zsh first.`);
+const only = process.argv.includes("--derivati")
+  ? process.argv[process.argv.indexOf("--derivati") + 1]
+  : null;
+
+const names = Object.keys(PLAN).filter((n) => !only || n === only);
+if (names.length === 0) {
+  console.error(`Nothing to build. Known plates: ${Object.keys(PLAN).join(", ")}`);
   process.exit(1);
 }
 
 let built = 0;
 const failed = [];
 
-for (const job of jobs) {
-  const name = path.parse(job).name;
-  const jobPath = path.join(SRC, job);
-
-  let payload;
+for (const name of names) {
+  // Prefer a master already on disk; fall back to the job payload's URL.
+  let master;
+  const masterPath = path.join(SRC, `${name}.png`);
   try {
-    payload = JSON.parse(await readFile(jobPath, "utf8"));
+    master = await readFile(masterPath);
   } catch {
-    failed.push(`${name}: job file is empty or not valid JSON`);
-    continue;
+    let payload;
+    try {
+      payload = JSON.parse(await readFile(path.join(SRC, `${name}.json`), "utf8"));
+    } catch {
+      failed.push(`${name}: no master on disk and no readable job payload`);
+      continue;
+    }
+
+    const url = findImageUrl(payload);
+    if (!url) {
+      failed.push(`${name}: no image URL in job payload`);
+      continue;
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      failed.push(`${name}: download failed (${response.status})`);
+      continue;
+    }
+    master = Buffer.from(await response.arrayBuffer());
+    // Keep the master for the audit trail before any transformation.
+    await writeFile(masterPath, master);
   }
 
-  const url = findImageUrl(payload);
-  if (!url) {
-    failed.push(`${name}: no image URL in job payload`);
-    continue;
+  for (const ratio of PLAN[name]) {
+    const { w, h, suffix } = RATIOS[ratio];
+    const file = path.join(OUT, `${name}${suffix}.avif`);
+    const info = await sharp(master)
+      .resize(w, h, { fit: "cover", position: "centre" })
+      .avif({ quality: 62, effort: 6 })
+      .toFile(file);
+
+    console.log(
+      `✓ ${`${name}${suffix}`.padEnd(26)} ${ratio.padEnd(10)} ${info.width}×${info.height}  ${(info.size / 1024).toFixed(1)} KB`,
+    );
+    built += 1;
   }
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    failed.push(`${name}: download failed (${response.status})`);
-    continue;
-  }
-  const master = Buffer.from(await response.arrayBuffer());
-
-  // Keep the master for the audit trail before any transformation.
-  await writeFile(path.join(SRC, `${name}.png`), master);
-
-  const info = await sharp(master)
-    .resize(WIDTH, HEIGHT, { fit: "cover", position: "centre" })
-    .avif({ quality: 62, effort: 6 })
-    .toFile(path.join(OUT, `${name}.avif`));
-
-  console.log(
-    `✓ ${name.padEnd(18)} ${info.width}×${info.height}  ${(info.size / 1024).toFixed(1)} KB`,
-  );
-  built += 1;
 }
 
 if (failed.length > 0) {

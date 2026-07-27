@@ -212,10 +212,10 @@ html[data-field="notte"] .prologue {
   isolation: isolate;
 }
 
-.hero > :not(.prologue-static),
-.scheda > :not(.prologue-static),
-.chapter--royal > :not(.prologue-static),
-.chapter--rows > :not(.prologue-static) {
+.hero > :not(.prologue-static, .piastra--campitura),
+.scheda > :not(.prologue-static, .piastra--campitura),
+.chapter--royal > :not(.prologue-static, .piastra--campitura),
+.chapter--rows > :not(.prologue-static, .piastra--campitura) {
   position: relative;
   z-index: 1;
 }
@@ -611,7 +611,7 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 /* 02 — archive / royal provenance */
 
 .chapter--royal {
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
 }
 
 .chapter--royal__head {
@@ -635,12 +635,6 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 
 .chapter--royal__data {
   grid-column: 5 / 8;
-  grid-row: 3;
-  margin-top: var(--space-13);
-}
-
-.chapter--royal__piastra {
-  grid-column: 2 / 5;
   grid-row: 3;
   margin-top: var(--space-13);
 }
@@ -728,12 +722,6 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   margin-top: var(--space-34);
 }
 
-.chapter--conservation__piastra {
-  grid-column: 2 / 5;
-  grid-row: 2;
-  align-self: end;
-}
-
 .chapter--conservation__data {
   grid-column: 5 / 8;
   grid-row: 3;
@@ -760,15 +748,6 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 .chapter--field__body {
   grid-column: 2 / 5;
   grid-row: 2;
-  margin-top: var(--space-13);
-}
-
-.chapter--field__piastre {
-  grid-column: 2 / 8;
-  grid-row: 3;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  column-gap: var(--gutter);
   margin-top: var(--space-13);
 }
 
@@ -834,21 +813,12 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   margin-top: var(--space-21);
 }
 
-.chapter--stone__piastre {
-  grid-column: 2 / 8;
-  grid-row: 4;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  column-gap: var(--gutter);
-  margin-top: var(--space-13);
-}
-
 /* 07 — three unequal records, never cards */
 
 .chapter--products {
   /* Height is content-driven. A fixed min-height would have to be revised
      every time a product is added — the section must absorb growth silently. */
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
 }
 
 .chapter--products__head {
@@ -881,7 +851,7 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 
 .products {
   grid-column: 1 / 8;
-  grid-row: 3;
+  grid-row: 4;
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -1633,10 +1603,9 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
 }
 
 /* ============================================================================
-   Piastre — register plates
-   The frame is 8:5 and its box is fixed by aspect-ratio, so a provisional
-   plate and the definitive photograph that replaces it occupy exactly the
-   same space. Swapping an asset cannot move the layout.
+   Piastre — the three photographic patterns
+   docs/art-review-immagini.md §9. Every plate on the page belongs to exactly
+   one of these. No borders, no keylines, no radius, no shadow (§8.6).
    ========================================================================= */
 
 .piastra {
@@ -1645,25 +1614,18 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
 
 .piastra__frame {
   position: relative;
-  aspect-ratio: 8 / 5;
   overflow: hidden;
-  background: color-mix(in srgb, var(--testo) 6%, transparent);
 }
 
 .piastra__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Plates sit in the field, not on it: the grade is pulled toward the paper
-     so no plate ever reads as a colour event. --chicco has a 2% budget and
+  /* Plates sit IN the field, not on it: the grade is pulled toward the paper
+     so no plate becomes a colour event. --chicco has a 2% budget and
      photography is what spends it (art-direction §4.4). */
   filter: saturate(0.72) contrast(1.04);
   mix-blend-mode: multiply;
-}
-
-[data-field="notte"] .piastra__img {
-  mix-blend-mode: normal;
-  filter: saturate(0.62) brightness(0.82);
 }
 
 .piastra__caption {
@@ -1694,20 +1656,221 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   border: 1px solid var(--rigo);
 }
 
-/* Plates stack on mobile: side by side at 390px each would be ~163px wide,
-   below the point where an 8:5 material study reads as anything. */
-@media (max-width: 767px) {
-  .chapter--field__piastre,
-  .chapter--stone__piastre {
-    grid-template-columns: 1fr;
-    row-gap: var(--space-5);
+/* — A · LASTRA ————————————————————————————————————————————————
+   8:5, large, running off the right viewport edge. Permitted in chapters 02,
+   05 and 07 only, one per chapter, at most 20% off-screen (§7.4.1).
+   The bleed is expressed as a percentage of the plate so the fraction
+   off-screen is the SPEC and the pixel value is the consequence. */
+
+.piastra--lastra .piastra__frame {
+  aspect-ratio: 8 / 5;
+}
+
+.chapter--royal__lastra,
+.chapter--field__lastra,
+.chapter--products__lastra {
+  --bleed: 16%;
+  width: calc(100% + var(--bleed));
+}
+
+/* Row 4, not 3: on row 3 it shared the cell with the registry column and the
+   data printed on top of the photograph. */
+.chapter--royal__lastra {
+  grid-column: 3 / -1;
+  grid-row: 4;
+  margin-top: var(--space-13);
+}
+
+.chapter--field__lastra {
+  --bleed: 14%;
+  grid-column: 3 / -1;
+  grid-row: 3;
+  margin-top: var(--space-13);
+}
+
+/* Row 3, below the ruler: on row 2 the 01–08 matrix and its vertical rules
+   printed straight over the photograph. */
+.chapter--products__lastra {
+  --bleed: 18%;
+  grid-column: 4 / -1;
+  grid-row: 3;
+  margin-top: var(--space-8);
+}
+
+/* ch06's single object. Contained, never bleeding: §7.4.1 allows the bleed in
+   chapters 02, 05 and 07 only, and three lastre are already spent. */
+.chapter--stone__oggetto {
+  grid-column: 5 / 8;
+  grid-row: 4;
+  margin-top: var(--space-13);
+}
+
+/* A bleed must never become a document scrollbar. The section clips; the page
+   does not scroll. */
+.chapter--royal,
+.chapter--field,
+.chapter--products {
+  overflow-x: clip;
+}
+
+/* — B · REPERTO ————————————————————————————————————————————————
+   A real 1:1 derivative, never an 8:5 file squeezed into a square box (§8.4).
+   Dropped entirely on mobile (§8.5). */
+
+.piastra--reperto .piastra__frame {
+  aspect-ratio: 1 / 1;
+}
+
+/* Left of the numeral, not under it: at cols 6–7 the square collided with
+   `2007`. Small square left, large numeral right — the tension is the point. */
+.chapter--conservation__reperto {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  align-self: end;
+  max-width: 320px;
+}
+
+/* — C · CAMPITURA ——————————————————————————————————————————————
+   The image as the ground the section is printed on. Decorative, aria-hidden,
+   no caption: a ground is not a citable plate. Opacity is tuned per section
+   against measured text contrast, not set once — see §13 of the review. */
+
+.piastra--campitura {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.piastra--campitura .piastra__img {
+  height: 100%;
+  opacity: var(--campitura-opacity, 0.1);
+}
+
+/*
+ * MEASURED, not chosen. The review proposed 0.10–0.14 as a starting range;
+ * at those values --pietra-testo (#625D4D) rendered at 4.35:1 on ch01 and
+ * 4.18:1 on ch06 — below the 4.5:1 AA floor for normal text. It reads at
+ * 5.15:1 on bare --carta, and the ground was eating the whole margin.
+ *
+ * These values are the highest that keep secondary text above 4.5:1 with
+ * headroom at 1440 and 1024. Primary text was never at risk (>11:1).
+ * Re-measure with scripts/, not by eye, if either is ever raised.
+ */
+.scheda .piastra--campitura .piastra__img {
+  --campitura-opacity: 0.055;
+  object-position: 50% 62%;
+}
+
+.chapter--stone .piastra--campitura .piastra__img {
+  --campitura-opacity: 0.06;
+  object-position: 50% 40%;
+}
+
+/* Sections carrying a ground must stack their content above it. */
+.chapter--stone,
+.chapter--field,
+.chapter--products,
+.chapter--conservation {
+  position: relative;
+  isolation: isolate;
+}
+
+.chapter--stone > :not(.piastra--campitura),
+.chapter--field > :not(.piastra--campitura),
+.chapter--products > :not(.piastra--campitura),
+.chapter--conservation > :not(.piastra--campitura) {
+  position: relative;
+  z-index: 1;
+}
+
+.scheda > .piastra--campitura {
+  z-index: 0;
+}
+
+@media (max-width: 1279px) {
+  /* Tablet keeps the bleed but takes it back a little: the field is narrower
+     and 16% of a smaller plate loses more of the subject. */
+  .chapter--royal__lastra,
+  .chapter--field__lastra,
+  .chapter--products__lastra {
+    --bleed: 10%;
+    grid-column: 2 / -1;
   }
 
-  .chapter--royal__piastra,
-  .chapter--conservation__piastra,
-  .chapter--field__piastre,
-  .chapter--stone__piastre {
+  .chapter--conservation__reperto {
+    grid-column: 2 / 5;
+    max-width: 260px;
+  }
+
+  .chapter--stone__oggetto {
+    grid-column: 4 / 8;
+  }
+}
+
+/* ch04's mobile stand-in is hidden above 768px, where the square is legal. */
+.chapter--conservation__mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* ════════════════════════════════════════════════════════════════════
+     MOBILE — the inverse hierarchy.
+
+     On desktop the plates carry the weight and the grounds whisper. Below
+     768px the plates cannot: §13.7 pulls them inside the field, §13.6 fixes
+     them at 8:5, and the void survives (§13.4), so no plate can exceed 291px
+     or 182px tall. Four plates at that ceiling is exactly the flat, one-scale
+     page this whole review set out to kill.
+
+     So mobile swaps the roles. The GROUNDS become the loud element — a
+     1550px-tall material surface the chapter is printed on — and the plates
+     become quiet punctuation at three different widths. Same assets, same
+     rules, different logic. This is a mobile composition, not a scaled desktop.
+     ════════════════════════════════════════════════════════════════════ */
+
+  /* §7.4.1 — the bleeding plates sit inside the field. A bleed at 390px would
+     cost a fifth of an already small image. */
+  .chapter--royal__lastra,
+  .chapter--field__lastra,
+  .chapter--products__lastra {
+    --bleed: 0%;
+    width: 100%;
     grid-column: 1 / 8;
     grid-row: auto;
+    margin-top: var(--space-8);
+  }
+
+  /* Three widths, not one. The full plates stay at 1–7; the two punctuation
+     plates take less, and one of them sits off the left axis so the page is
+     not a single stack of identical rectangles. This is not a zig-zag (§7.5):
+     nothing alternates, one element is offset once. */
+  .chapter--conservation__mobile {
+    display: block;
+    grid-column: 1 / 6;
+    grid-row: auto;
+    margin-top: var(--space-5);
+  }
+
+  .chapter--stone__oggetto {
+    grid-column: 3 / 8;
+  }
+
+  /* §8.5 — 1:1 assets are dropped on mobile. */
+  .chapter--conservation__reperto {
+    display: none;
+  }
+
+  /* The grounds get STRONGER on mobile, not weaker. The first pass reduced
+     them by 25%, which made the only element capable of carrying scale on a
+     phone nearly invisible. Values below are the measured ceiling that keeps
+     --pietra-testo above 4.5:1 at 390px. */
+  .scheda .piastra--campitura .piastra__img {
+    --campitura-opacity: 0.075;
+  }
+
+  .chapter--stone .piastra--campitura .piastra__img {
+    --campitura-opacity: 0.08;
   }
 }
