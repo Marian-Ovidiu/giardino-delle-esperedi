@@ -721,6 +721,82 @@ test.describe("OTTO full experience", () => {
     }
   });
 
+  test("gives every narrative section visual support", async ({ page }) => {
+    // The chapters that were carrying copy alone.
+    for (const id of ["mais-del-re", "quasi-estinto", "il-campo", "la-pietra"]) {
+      const plates = page.locator(`#${id} .piastra`);
+      expect(await plates.count(), `#${id} has no plate`).toBeGreaterThanOrEqual(1);
+    }
+
+    // Every plate actually resolves — a 404 renders as an empty box that reads
+    // as a broken layout rather than as a missing asset.
+    const broken = await page.locator(".piastra__img").evaluateAll((images) =>
+      images
+        .filter((img) => !(img instanceof HTMLImageElement) || img.naturalWidth === 0)
+        .map((img) => (img as HTMLImageElement).getAttribute("src")),
+    );
+    expect(broken).toEqual([]);
+  });
+
+  test("labels provisional plates and claims nothing through them", async ({ page }) => {
+    const provisional = page.locator('.piastra[data-status="provvisorio"]');
+    const count = await provisional.count();
+    expect(count).toBeGreaterThan(0);
+
+    // A stand-in shown without saying so is a claim the register has not
+    // earned. The annotation disappears on its own once status is definitivo.
+    for (let i = 0; i < count; i += 1) {
+      await expect(provisional.nth(i).locator(".piastra__nota")).toHaveCount(1);
+    }
+
+    // Alt text and captions describe what is visible — never a place, an
+    // owner, a person or a process. These images are narrative, not
+    // documentary, and must not be readable as evidence.
+    const texts = await page.locator(".piastra").evaluateAll((figures) =>
+      figures.map(
+        (f) =>
+          `${f.querySelector("img")?.getAttribute("alt") ?? ""} ${f.querySelector("figcaption")?.textContent ?? ""}`,
+      ),
+    );
+    const forbidden = [
+      "azienda",
+      "aziendal",
+      "giardino",
+      "cherasco",
+      "piemonte",
+      "langhe",
+      "matteo",
+      "nostro",
+      "nostra",
+      "coltivat",
+      "raccolt",
+      "storic",
+      "originale",
+      "archivio",
+    ];
+    for (const text of texts) {
+      const lower = text.toLowerCase();
+      for (const word of forbidden) {
+        expect(lower, `plate text must not imply "${word}": "${text.trim()}"`).not.toContain(word);
+      }
+    }
+  });
+
+  test("reserves identical space whatever a plate's status", async ({ page }) => {
+    // The box is fixed by aspect-ratio, so swapping a provisional plate for
+    // the definitive photograph cannot move the layout.
+    const ratios = await page.locator(".piastra__frame").evaluateAll((frames) =>
+      frames.map((f) => {
+        const r = f.getBoundingClientRect();
+        return r.height === 0 ? 0 : Number((r.width / r.height).toFixed(2));
+      }),
+    );
+    expect(ratios.length).toBeGreaterThan(0);
+    for (const ratio of ratios) {
+      expect(ratio).toBeCloseTo(1.6, 1); // 8:5
+    }
+  });
+
   test("runs without client exceptions or console errors", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));

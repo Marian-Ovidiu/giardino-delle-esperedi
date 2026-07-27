@@ -1,4 +1,5 @@
 import { RegistroDati } from "@/components/RegistroDati";
+import { Piastra } from "@/components/Piastra";
 import { StaticProloguePlate } from "@/components/StaticProloguePlate";
 import { catalogo, chapters, cta, custodia, referenze } from "@/content/site";
 
@@ -41,6 +42,7 @@ export function RoyalChapter() {
       <div className="chapter--royal__data">
         <RegistroDati rows={chapter.data} />
       </div>
+      <Piastra slot="re-materia" className="chapter--royal__piastra" sizes="(max-width: 767px) 100vw, 40vw" />
     </section>
   );
 }
@@ -106,6 +108,7 @@ export function ConservationChapter() {
       <div className="chapter--conservation__data">
         <RegistroDati rows={chapter.data} />
       </div>
+      <Piastra slot="atmosfera-luce" className="chapter--conservation__piastra" sizes="(max-width: 767px) 100vw, 30vw" />
     </section>
   );
 }
@@ -131,6 +134,10 @@ export function FieldChapter() {
             {paragraph}
           </p>
         ))}
+      </div>
+      <div className="chapter--field__piastre">
+        <Piastra slot="campo-terra" sizes="(max-width: 767px) 100vw, 36vw" />
+        <Piastra slot="campo-coltura" sizes="(max-width: 767px) 100vw, 36vw" />
       </div>
       <p className="chapter--field__chain t-data" aria-label="Filiera aziendale">
         Semina <span aria-hidden="true">→</span> raccolta <span aria-hidden="true">→</span>{" "}
@@ -174,6 +181,10 @@ export function StoneChapter() {
       </div>
       <div className="chapter--stone__data">
         <RegistroDati rows={chapter.data} />
+      </div>
+      <div className="chapter--stone__piastre">
+        <Piastra slot="pietra-macina" sizes="(max-width: 767px) 100vw, 36vw" />
+        <Piastra slot="pietra-farina" sizes="(max-width: 767px) 100vw, 36vw" />
       </div>
     </section>
   );

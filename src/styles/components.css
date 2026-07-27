@@ -639,6 +639,12 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   margin-top: var(--space-13);
 }
 
+.chapter--royal__piastra {
+  grid-column: 2 / 5;
+  grid-row: 3;
+  margin-top: var(--space-13);
+}
+
 /* 03 — eight proved as structure */
 
 .chapter--rows {
@@ -722,6 +728,12 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   margin-top: var(--space-34);
 }
 
+.chapter--conservation__piastra {
+  grid-column: 2 / 5;
+  grid-row: 2;
+  align-self: end;
+}
+
 .chapter--conservation__data {
   grid-column: 5 / 8;
   grid-row: 3;
@@ -731,7 +743,7 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 /* 05 — data leads, prose follows */
 
 .chapter--field {
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
 }
 
 .chapter--field__head {
@@ -751,9 +763,18 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   margin-top: var(--space-13);
 }
 
+.chapter--field__piastre {
+  grid-column: 2 / 8;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: var(--gutter);
+  margin-top: var(--space-13);
+}
+
 .chapter--field__chain {
   grid-column: 3 / 8;
-  grid-row: 3;
+  grid-row: 4;
   margin-top: var(--space-21);
   padding-block: var(--space-3);
   border-block: 1px solid var(--rigo);
@@ -764,7 +785,7 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 /* 06 — the irreversible transformation */
 
 .chapter--stone {
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
 }
 
 .chapter--stone__head {
@@ -811,6 +832,15 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   grid-column: 5 / 8;
   grid-row: 3;
   margin-top: var(--space-21);
+}
+
+.chapter--stone__piastre {
+  grid-column: 2 / 8;
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: var(--gutter);
+  margin-top: var(--space-13);
 }
 
 /* 07 — three unequal records, never cards */
@@ -1599,5 +1629,85 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
 @media (prefers-reduced-motion: reduce) {
   .chapter--custody {
     transition-duration: var(--dur-0);
+  }
+}
+
+/* ============================================================================
+   Piastre — register plates
+   The frame is 8:5 and its box is fixed by aspect-ratio, so a provisional
+   plate and the definitive photograph that replaces it occupy exactly the
+   same space. Swapping an asset cannot move the layout.
+   ========================================================================= */
+
+.piastra {
+  margin: 0;
+}
+
+.piastra__frame {
+  position: relative;
+  aspect-ratio: 8 / 5;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--testo) 6%, transparent);
+}
+
+.piastra__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Plates sit in the field, not on it: the grade is pulled toward the paper
+     so no plate ever reads as a colour event. --chicco has a 2% budget and
+     photography is what spends it (art-direction §4.4). */
+  filter: saturate(0.72) contrast(1.04);
+  mix-blend-mode: multiply;
+}
+
+[data-field="notte"] .piastra__img {
+  mix-blend-mode: normal;
+  filter: saturate(0.62) brightness(0.82);
+}
+
+.piastra__caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+  margin-top: var(--space-2);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--rigo);
+  color: var(--testo-2);
+}
+
+/* Says out loud that the plate is a stand-in. Disappears by itself when the
+   asset's status becomes `definitivo`. */
+.piastra__nota {
+  margin-left: auto;
+  color: var(--testo-2);
+}
+
+.piastra__nota::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-right: var(--space-1);
+  vertical-align: 0.2em;
+  border: 1px solid var(--rigo);
+}
+
+/* Plates stack on mobile: side by side at 390px each would be ~163px wide,
+   below the point where an 8:5 material study reads as anything. */
+@media (max-width: 767px) {
+  .chapter--field__piastre,
+  .chapter--stone__piastre {
+    grid-template-columns: 1fr;
+    row-gap: var(--space-5);
+  }
+
+  .chapter--royal__piastra,
+  .chapter--conservation__piastra,
+  .chapter--field__piastre,
+  .chapter--stone__piastre {
+    grid-column: 1 / 8;
+    grid-row: auto;
   }
 }
