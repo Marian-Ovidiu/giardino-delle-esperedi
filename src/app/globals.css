@@ -1,26 +1,384 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/components.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Expose the tokens Tailwind needs to generate utilities from. Everything
+   else is consumed directly as a custom property — the art direction is too
+   specific to express as utility classes, and inventing utilities for it is
+   how a design system quietly becomes a generic one. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-campo: var(--campo);
+  --color-testo: var(--testo);
+  --color-testo-2: var(--testo-2);
+  --color-rigo: var(--rigo);
+  --color-indice: var(--indice);
+  --font-display: var(--font-display), "Times New Roman", serif;
+  --font-text: var(--font-text), system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================================
+   Base
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background-color: var(--campo);
+  color: var(--testo);
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-lh);
+  font-synthesis: none; /* §3.8 — Archivo/DM Mono italic do not ship */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* The inversion. --dur-3 with the one easing reserved for chapter 08. */
+  transition:
+    background-color var(--dur-3) var(--ease-inversione),
+    color var(--dur-3) var(--ease-inversione);
+}
+
+/* Reversing is an undo, not a rewind: 160ms, so the 2.99:1 pair
+   (--pietra-testo on --notte) is never on screen long enough to be read. */
+html[data-inversion="reversing"] body {
+  transition-duration: var(--dur-1);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("/images/textures/carta.avif");
+  background-size: 640px 400px;
+  opacity: 0.16;
+  transition: opacity var(--dur-3) var(--ease-inversione);
+}
+
+main,
+.contact {
+  position: relative;
+  z-index: 2;
+}
+
+/* §4.3 — selection is NOT --chicco. A browser fill is exactly where
+   Invariant 2 leaks in practice. */
+::selection {
+  background: var(--testo);
+  color: var(--campo);
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote {
+  margin: 0;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================================
+   Interactive text — motion-spec §7
+   A link that is only identifiable on hover fails WCAG 1.4.1 and is invisible
+   to touch. So the underline is PERSISTENT and hover only changes its colour.
+   Fast in (160), slower out (320). Nothing scales, lifts, shadows or moves.
+   ========================================================================= */
+
+.contact__email,
+.contact__phone,
+.contact__social a,
+.contact__legal a,
+.chapter--products__cta {
+  text-decoration: underline;
+  text-decoration-color: var(--rigo);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 8px;
+  transition: text-decoration-color var(--dur-2) var(--ease-uscita);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact__email:hover,
+  .contact__phone:hover,
+  .contact__social a:hover,
+  .contact__legal a:hover,
+  .chapter--products__cta:hover {
+    text-decoration-color: var(--indice);
+    transition-duration: var(--dur-1);
+    transition-timing-function: var(--ease-registro);
+  }
+}
+
+/* §4.3 — focus ring is --indice: 4.68:1 on day, 8.74:1 on night. */
+:focus-visible {
+  outline: 1px solid var(--indice);
+  outline-offset: 4px;
+}
+
+/* ============================================================================
+   § 3 · Type roles
+   Named for what they are in the register, not for how big they are.
+   ========================================================================= */
+
+.t-d0,
+.t-d1,
+.t-d2,
+.t-d3,
+.t-d4 {
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-optical-sizing: auto;
+}
+
+/* §3.7.7 — the one sanctioned manual opsz override: the hero stays engraved
+   at every viewport instead of thickening as it scales down. */
+.t-d0 {
+  font-size: var(--type-d0-size);
+  line-height: var(--type-d0-lh);
+  font-weight: 400;
+  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  text-wrap: nowrap;
+}
+
+.t-d1 {
+  font-size: var(--type-d1-size);
+  line-height: var(--type-d1-lh);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+}
+
+.t-d2 {
+  font-size: var(--type-d2-size);
+  line-height: var(--type-d2-lh);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.t-d3 {
+  font-size: var(--type-d3-size);
+  line-height: var(--type-d3-lh);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.t-d4 {
+  font-size: var(--type-d4-size);
+  line-height: var(--type-d4-lh);
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+/* §3.7.6 — Bodoni hairlines vanish on dark grounds. */
+[data-field="notte"] .t-d3,
+[data-field="notte"] .t-d4 {
+  font-weight: 500;
+}
+
+.t-lead {
+  font-size: var(--type-lead-size);
+  line-height: var(--type-lead-lh);
+  font-weight: 300;
+  letter-spacing: -0.005em;
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+.t-body {
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-lh);
+  font-weight: 400;
+  max-width: var(--measure);
+  text-wrap: pretty;
+  hyphens: manual; /* §3.9 — a registry does not break words */
+}
+
+.t-small {
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-lh);
+  letter-spacing: 0.005em;
+}
+
+/* Registry labels. Authored in normal case, uppercased here — screen readers
+   spell out all-caps strings letter by letter. */
+.t-label,
+.t-label-lg {
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-stretch: 125%;
+  text-transform: uppercase;
+}
+
+.t-label {
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-lh);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.t-label-lg {
+  font-size: var(--type-label-lg-size);
+  line-height: var(--type-label-lg-lh);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.t-data,
+.t-data-lg,
+.t-num,
+.t-num-lg {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums; /* §3.9 — values must align */
+}
+
+.t-data {
+  font-size: var(--type-data-size);
+  line-height: var(--type-data-lh);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.t-data-lg {
+  font-size: var(--type-data-lg-size);
+  line-height: var(--type-data-lg-lh);
+  letter-spacing: 0.02em;
+}
+
+.t-num {
+  font-size: var(--type-num-size);
+  line-height: var(--type-num-lh);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+.t-num-lg {
+  font-size: var(--type-num-lg-size);
+  line-height: var(--type-num-lg-lh);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+/* §3.8 — italic exists in Bodoni only, in three sanctioned cases. */
+.t-italic {
+  font-family: var(--font-display-italic), var(--font-display), "Times New Roman", serif;
+  font-style: italic;
+}
+
+/* ============================================================================
+   § 5 · Grid
+   Eight columns at every breakpoint. Never four, never twelve, never a flex
+   row. Column widths are computed by 1fr and are exempt from the ×8 rule.
+   There is no right padding: column 8 IS the right margin.
+   ========================================================================= */
+
+.field {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  column-gap: var(--gutter);
+  margin-left: var(--rail-w);
+  padding-left: var(--pad-left);
+  padding-right: 0;
+  width: min(calc(100vw - var(--rail-w)), calc(var(--field-max) + var(--pad-left)));
+}
+
+/* ============================================================================
+   Utility
+   ========================================================================= */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: var(--space-1);
+  z-index: 100;
+  display: inline-flex;
+  min-width: 40px;
+  min-height: 40px;
+  padding: var(--space-1) var(--space-2);
+  align-items: center;
+  background: var(--testo);
+  color: var(--campo);
+  transform: translateY(-120%);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: var(--space-1);
+  transform: translateY(0);
+}
+
+/* QA aid — toggle to verify §6.3. Every baseline must land on a line. */
+.debug-baseline {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(178, 58, 22, 0.18) 0 1px,
+    transparent 1px 8px
+  );
+}
+
+/* ============================================================================
+   Reduced motion
+   NOT a degraded experience. Transforms and scroll-linked movement stop;
+   composition and the chapter-08 inversion are PRESERVED (removing the
+   inversion is a defect, not an accommodation — art-direction §12).
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    transition-duration: var(--dur-0);
+  }
+
+  body::before {
+    transition-duration: var(--dur-0);
+  }
+
+  [data-motion="reveal"],
+  [data-motion="mount"],
+  [data-motion="rail-kernel"] {
+    animation: none;
+    transition-duration: var(--dur-0);
+    transform: none;
+    clip-path: none;
+    opacity: 1;
+  }
 }

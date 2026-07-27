@@ -1,0 +1,1428 @@
+/* ============================================================================
+   OTTO — component layout
+   Grid placement per art-direction §5.3, rhythm per §6.2.
+   Column 8 is never occupied: it is the reserved void.
+   ========================================================================= */
+
+/* — scheda ———————————————————————————————————————————————— */
+
+/* — fixed index / Riga Ottava ————————————————————————————— */
+
+.rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 100;
+  width: var(--rail-w);
+  height: 100vh;
+  border-right: 1px solid var(--rigo);
+}
+
+.rail__cover {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-1);
+  color: var(--testo-2);
+  writing-mode: vertical-rl;
+}
+
+.rail__touch-label {
+  display: none;
+}
+
+.rail__list {
+  position: absolute;
+  top: 50vh;
+  left: 0;
+  width: 100%;
+  height: 320px;
+  padding: 0;
+  margin: -160px 0 0;
+  list-style: none;
+}
+
+.rail__item,
+.rail__link {
+  display: block;
+  width: var(--rail-w);
+  height: 40px;
+}
+
+.rail__link {
+  position: relative;
+}
+
+.rail__kernels {
+  display: grid;
+  grid-template-columns: repeat(8, 8px);
+  width: 64px;
+  height: 40px;
+  align-items: center;
+}
+
+.rail__kernel {
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin-left: 2px;
+  border: 1px solid var(--rigo);
+  transition:
+    background-color var(--dur-1) var(--ease-registro),
+    border-color var(--dur-1) var(--ease-registro);
+}
+
+.rail__kernel[data-state="completed"] {
+  border-color: var(--testo);
+  background: var(--testo);
+}
+
+.rail__kernel[data-state="active"] {
+  border-color: var(--indice);
+  background: var(--indice);
+}
+
+.rail__panel {
+  position: absolute;
+  top: -12px;
+  left: calc(100% + 1px);
+  z-index: 110;
+  display: grid;
+  grid-template-columns: 40px 104px 1fr;
+  column-gap: var(--space-2);
+  align-items: center;
+  width: 384px;
+  height: 64px;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--rigo);
+  background: var(--carta);
+  color: var(--inchiostro);
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
+  transition: clip-path var(--dur-2) var(--ease-uscita);
+}
+
+.rail__panel-title {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  border-inline: 1px solid var(--pietra);
+  padding-inline: var(--space-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rail__link:hover .rail__panel,
+  .rail__link:focus-visible .rail__panel {
+    clip-path: inset(0 0 0 0);
+    transition-timing-function: var(--ease-registro);
+  }
+}
+
+/* — top navigation ————————————————————————————————————————— */
+
+.site-header {
+  position: absolute;
+  top: var(--space-5);
+  left: 0;
+  z-index: 50;
+  align-items: baseline;
+}
+
+.site-header__wordmark {
+  grid-column: 2 / 5;
+}
+
+.site-header__meta {
+  grid-column: 5 / 7;
+  color: var(--testo-2);
+  text-align: right;
+}
+
+.site-header__link {
+  grid-column: 7 / 8;
+  justify-self: end;
+  display: inline-flex;
+  min-width: 40px;
+  min-height: 40px;
+  padding-inline: var(--space-1);
+  align-items: center;
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--indice);
+}
+
+/* — unnumbered cover —————————————————————————————————————— */
+
+.hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100svh;
+  padding-top: var(--space-21);
+  padding-bottom: var(--space-13);
+  align-content: end;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* — signature prologue · dispersion → register ———————————————— */
+
+.prologue {
+  --prologue-opacity: 0.28;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+}
+
+.prologue__frame {
+  height: 100%;
+  align-items: stretch;
+}
+
+.prologue__viewport {
+  position: relative;
+  grid-column: 1 / 8;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  opacity: var(--prologue-opacity);
+  mix-blend-mode: multiply;
+}
+
+.prologue__canvas {
+  display: none;
+  width: 100%;
+  height: 100%;
+  filter: saturate(0.92);
+}
+
+.prologue[data-enhanced="true"] .prologue__canvas {
+  display: block;
+}
+
+html[data-field="notte"] .prologue {
+  opacity: 0;
+}
+
+/* Static renderer states are decorative section backgrounds, never figures. */
+.hero,
+.scheda,
+.chapter--royal,
+.chapter--rows {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero > :not(.prologue-static),
+.scheda > :not(.prologue-static),
+.chapter--royal > :not(.prologue-static),
+.chapter--rows > :not(.prologue-static) {
+  position: relative;
+  z-index: 1;
+}
+
+.prologue-static {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.prologue-static img {
+  object-fit: contain;
+}
+
+.prologue-static--dispersion {
+  opacity: 0.28;
+}
+
+.prologue-static--plant {
+  opacity: 0.18;
+}
+
+.prologue-static--incisions {
+  opacity: 0.3;
+}
+
+.prologue-static--release {
+  inset: 0 0 auto;
+  height: 32svh;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 32%, transparent 90%);
+  mask-image: linear-gradient(to bottom, #000 0 32%, transparent 90%);
+}
+
+html[data-prologue-renderer="webgl2"] .prologue-static {
+  display: none;
+}
+
+/* Isolated review route used by deterministic plate export in development. */
+.prologue--preview {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 100%;
+  height: 100svh;
+  min-height: 100svh;
+  contain: layout paint;
+}
+
+.prologue--preview .prologue__frame {
+  margin-left: 0;
+  padding-left: 0;
+  width: 100%;
+}
+
+.prologue--preview .prologue__viewport {
+  grid-column: 1 / -1;
+}
+
+.hero__meta {
+  grid-column: 2 / 7;
+  margin-bottom: var(--space-8);
+  color: var(--testo-2);
+}
+
+.hero__display {
+  grid-column: 1 / 8;
+}
+
+.hero__title-line {
+  display: block;
+  overflow: hidden;
+}
+
+.hero__title-line > span {
+  display: block;
+}
+
+.hero__title-line em {
+  font-style: normal;
+}
+
+.hero__title-line--wide {
+  width: max-content;
+  white-space: nowrap;
+}
+
+.scheda {
+  padding-top: var(--space-21);
+  padding-bottom: var(--space-21);
+  align-items: start;
+}
+
+.scheda__testo {
+  grid-column: 2 / 6; /* text axis at col 2, body spans 2–5 */
+}
+
+.scheda__dati {
+  grid-column: 6 / 8; /* facts beside the body, void at col 8 */
+}
+
+.scheda__etichetta {
+  color: var(--testo-2);
+  margin-bottom: var(--space-3);
+}
+
+.scheda__titolo {
+  margin-bottom: var(--space-5);
+}
+
+.scheda__occhiello {
+  margin-bottom: var(--space-5);
+}
+
+.scheda__corpo + .scheda__corpo {
+  margin-top: var(--space-3);
+}
+
+@media (max-width: 1279px) {
+  .prologue-static--release {
+    height: 28svh;
+  }
+
+  .prologue-static--dispersion {
+    opacity: 0.22;
+  }
+
+  .prologue-static--plant {
+    opacity: 0.14;
+  }
+
+  .prologue-static--incisions {
+    opacity: 0.26;
+  }
+
+  .rail__kernels {
+    grid-template-columns: repeat(8, 6px);
+    width: 48px;
+  }
+
+  .rail__kernel {
+    width: 3px;
+    height: 3px;
+    margin-left: 1.5px;
+  }
+
+  .rail__panel {
+    display: none;
+  }
+
+  .site-header__wordmark {
+    grid-column: 2 / 6;
+  }
+
+  .site-header__meta {
+    display: none;
+  }
+
+  .site-header__link {
+    grid-column: 7 / 8;
+  }
+
+  .hero__display {
+    grid-column: 1 / 8;
+  }
+
+  .scheda {
+    padding-top: var(--space-13);
+    padding-bottom: var(--space-13);
+  }
+
+  .scheda__testo {
+    grid-column: 2 / 7;
+  }
+
+  /* Tablet: the facts drop below the body rather than squeezing the measure. */
+  .scheda__dati {
+    grid-column: 2 / 8;
+    margin-top: var(--space-8);
+  }
+}
+
+@media (max-width: 767px) {
+  .prologue-static--release {
+    height: 24svh;
+  }
+
+  .rail__cover {
+    left: 12px;
+  }
+
+  .rail__touch-label {
+    position: absolute;
+    top: var(--space-8);
+    left: 12px;
+    display: block;
+    height: 168px;
+    /* NOT --indice. The tap label is a transient UI state, and colouring it
+       with the index colour turns --chicco into a state colour — the exact
+       Invariant 2 failure mode (art-direction §4.4, illegal use 4). */
+    color: var(--testo-2);
+    writing-mode: vertical-rl;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path var(--dur-1) var(--ease-registro);
+  }
+
+  .rail__touch-label[data-visible="true"] {
+    clip-path: inset(0 0 0 0);
+  }
+
+  .rail__kernels {
+    grid-template-columns: repeat(8, 4px);
+    width: 40px;
+    padding-left: 4px;
+  }
+
+  .rail__kernel {
+    width: 2px;
+    height: 2px;
+    margin-left: 1px;
+  }
+
+  .site-header {
+    top: var(--space-3);
+  }
+
+  .site-header__wordmark {
+    grid-column: 1 / 6;
+  }
+
+  .site-header__link {
+    grid-column: 6 / 8;
+  }
+
+  .hero {
+    padding-top: var(--space-13);
+    padding-bottom: var(--space-8);
+  }
+
+  .prologue-static--dispersion {
+    opacity: 0.18;
+  }
+
+  .prologue-static--plant {
+    opacity: 0.12;
+  }
+
+  .prologue-static--incisions {
+    opacity: 0.22;
+  }
+
+  .hero__meta {
+    grid-column: 1 / 8;
+    margin-bottom: var(--space-5);
+  }
+
+  .hero__display {
+    grid-column: 1 / 8;
+  }
+
+  .hero__title-line--wide {
+    width: max-content;
+    white-space: nowrap;
+  }
+
+  .scheda {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
+
+  /* Mobile: text axis moves to column 1. Holding it at column 2 would cost
+     42px of a 390px screen for no structural gain (§5.3). */
+  .scheda__testo,
+  .scheda__dati {
+    grid-column: 1 / 8;
+  }
+
+  .scheda__etichetta {
+    margin-bottom: var(--space-2);
+  }
+
+  .scheda__titolo,
+  .scheda__occhiello {
+    margin-bottom: var(--space-3);
+  }
+
+  .scheda__dati {
+    margin-top: var(--space-5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail__kernel {
+    transition-duration: var(--dur-0);
+  }
+
+  .rail__touch-label,
+  .chapter--custody {
+    transition-duration: var(--dur-0);
+  }
+
+  .prologue__canvas {
+    display: none !important;
+  }
+
+  .hero__title-line > span {
+    transform: none !important;
+  }
+}
+
+/* — registro (the data table) —————————————————————————————— */
+
+.registro__riga {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-2);
+  min-height: var(--space-5);
+  padding-block: var(--space-1);
+  align-items: start;
+  border-top: 1px solid var(--rigo);
+}
+
+.registro__riga:last-child {
+  border-bottom: 1px solid var(--rigo);
+}
+
+.registro__etichetta {
+  color: var(--testo-2);
+}
+
+.registro__valore {
+  margin: 0;
+  color: var(--testo);
+  text-align: right;
+}
+
+/* Hairlines resolve to half a device pixel on retina — sharper, and one of
+   the four sanctioned exemptions from the ×8 rule (§6.1). */
+@media (min-resolution: 2dppx) {
+  .registro__riga {
+    border-top-width: 0.5px;
+  }
+
+  .registro__riga:last-child {
+    border-bottom-width: 0.5px;
+  }
+}
+
+/* ==========================================================================
+   Full register — seven distinct chapter compositions after Scheda 01
+   ========================================================================= */
+
+.scheda {
+  min-height: 120svh;
+}
+
+.chapter {
+  min-height: 120svh;
+  padding-block: var(--space-21);
+  align-content: start;
+  border-top: 1px solid var(--rigo);
+}
+
+.chapter__label {
+  margin-bottom: var(--space-3);
+  color: var(--testo-2);
+}
+
+.chapter__title {
+  margin-bottom: var(--space-5);
+}
+
+.chapter__standfirst {
+  margin-bottom: var(--space-5);
+}
+
+.chapter .t-body + .t-body {
+  margin-top: var(--space-3);
+}
+
+/* 02 — archive / royal provenance */
+
+.chapter--royal {
+  grid-template-rows: auto auto auto;
+}
+
+.chapter--royal__head {
+  grid-column: 2 / 6;
+  grid-row: 1;
+}
+
+.chapter--royal__mark {
+  grid-column: 5 / 8;
+  grid-row: 1 / 3;
+  align-self: end;
+  color: var(--rigo);
+  opacity: 0.48;
+}
+
+.chapter--royal__body {
+  grid-column: 2 / 5;
+  grid-row: 2;
+  margin-top: var(--space-21);
+}
+
+.chapter--royal__data {
+  grid-column: 5 / 8;
+  grid-row: 3;
+  margin-top: var(--space-13);
+}
+
+/* 03 — eight proved as structure */
+
+.chapter--rows {
+  grid-template-rows: auto auto auto;
+  overflow: hidden;
+}
+
+.chapter--rows__head {
+  grid-column: 2 / 6;
+  grid-row: 1;
+}
+
+.chapter--rows__proof {
+  grid-column: 2 / 8;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  min-height: var(--space-34);
+  margin-top: var(--space-13);
+  border-block: 1px solid var(--rigo);
+}
+
+.chapter--rows__proof span {
+  position: relative;
+  border-left: 1px solid var(--rigo);
+}
+
+.chapter--rows__proof span:last-child {
+  border-right: 1px solid var(--rigo);
+}
+
+.chapter--rows__proof b {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-1);
+  color: var(--testo-2);
+  font-weight: 400;
+}
+
+.chapter--rows__eight {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  margin-top: var(--space-8);
+  color: var(--rigo);
+}
+
+.chapter--rows__body {
+  grid-column: 3 / 6;
+  grid-row: 3;
+  margin-top: var(--space-13);
+}
+
+.chapter--rows__data {
+  grid-column: 6 / 8;
+  grid-row: 3;
+  margin-top: var(--space-21);
+}
+
+/* 04 — loss expressed as duration and void */
+
+.chapter--conservation {
+  min-height: 168svh;
+  grid-template-rows: auto auto auto;
+}
+
+.chapter--conservation__head {
+  grid-column: 2 / 6;
+  grid-row: 1;
+}
+
+.chapter--conservation__year {
+  grid-column: 6 / 8;
+  grid-row: 2;
+  margin-top: var(--space-21);
+  color: var(--indice);
+}
+
+.chapter--conservation__body {
+  grid-column: 2 / 5;
+  grid-row: 3;
+  margin-top: var(--space-34);
+}
+
+.chapter--conservation__data {
+  grid-column: 5 / 8;
+  grid-row: 3;
+  margin-top: calc(var(--space-34) + var(--space-8));
+}
+
+/* 05 — data leads, prose follows */
+
+.chapter--field {
+  grid-template-rows: auto auto auto;
+}
+
+.chapter--field__head {
+  grid-column: 2 / 5;
+  grid-row: 1;
+}
+
+.chapter--field__data {
+  grid-column: 5 / 8;
+  grid-row: 1;
+  margin-top: var(--space-8);
+}
+
+.chapter--field__body {
+  grid-column: 2 / 5;
+  grid-row: 2;
+  margin-top: var(--space-13);
+}
+
+.chapter--field__chain {
+  grid-column: 3 / 8;
+  grid-row: 3;
+  margin-top: var(--space-21);
+  padding-block: var(--space-3);
+  border-block: 1px solid var(--rigo);
+  color: var(--testo-2);
+  word-spacing: var(--space-2);
+}
+
+/* 06 — the irreversible transformation */
+
+.chapter--stone {
+  grid-template-rows: auto auto auto;
+}
+
+.chapter--stone__head {
+  grid-column: 2 / 6;
+  grid-row: 1;
+}
+
+.chapter--stone__states {
+  grid-column: 2 / 8;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 3fr 1fr 3fr;
+  align-items: end;
+  margin-top: var(--space-13);
+  padding-block: var(--space-5);
+  border-block: 1px solid var(--rigo-forte);
+}
+
+.chapter--stone__states p span,
+.chapter--stone__states p strong {
+  display: block;
+}
+
+.chapter--stone__states p span {
+  margin-bottom: var(--space-3);
+  color: var(--testo-2);
+}
+
+.chapter--stone__states strong {
+  font-weight: 400;
+}
+
+.chapter--stone__cut {
+  color: var(--indice);
+}
+
+.chapter--stone__body {
+  grid-column: 2 / 5;
+  grid-row: 3;
+  margin-top: var(--space-13);
+}
+
+.chapter--stone__data {
+  grid-column: 5 / 8;
+  grid-row: 3;
+  margin-top: var(--space-21);
+}
+
+/* 07 — three unequal records, never cards */
+
+.chapter--products {
+  min-height: 168svh;
+  grid-template-rows: auto auto auto auto;
+}
+
+.chapter--products__head {
+  grid-column: 2 / 6;
+  grid-row: 1;
+}
+
+.chapter--products__matrix {
+  grid-column: 4 / 8;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--rigo);
+}
+
+.chapter--products__matrix span {
+  padding-top: var(--space-1);
+  border-right: 1px solid var(--rigo);
+  color: var(--testo-2);
+}
+
+.chapter--products__matrix span:last-child {
+  border-right: 0;
+}
+
+.products {
+  grid-column: 1 / 8;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: var(--gutter);
+  align-items: start;
+  padding: 0;
+  margin: var(--space-21) 0 0;
+  list-style: none;
+}
+
+.product {
+  min-height: 560px;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rigo-forte);
+}
+
+.product--maisette {
+  grid-column: 1 / 4;
+}
+
+.product--maissini {
+  grid-column: 4 / 6;
+  margin-top: var(--space-13);
+}
+
+.product--farina {
+  grid-column: 6 / 8;
+  margin-top: var(--space-21);
+}
+
+.product__index span {
+  display: block;
+  color: var(--testo-2);
+}
+
+.product__name {
+  margin-top: var(--space-5);
+}
+
+.product__definition,
+.product__format,
+.product__extra {
+  margin-top: var(--space-5);
+}
+
+.product__format {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  padding-block: var(--space-1);
+  border-block: 1px solid var(--rigo);
+}
+
+.product__format dd {
+  margin: 0;
+}
+
+.product__extra {
+  color: var(--testo-2);
+}
+
+.chapter--products__cta {
+  grid-column: 5 / 8;
+  grid-row: 4;
+  justify-self: start;
+  display: inline-flex;
+  min-width: 40px;
+  min-height: 40px;
+  padding-inline: var(--space-1);
+  align-items: center;
+  margin-top: var(--space-13);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--indice);
+}
+
+/* 08 — the one chromatic event */
+
+.chapter--custody {
+  position: relative;
+  min-height: 240svh;
+  padding: 0;
+  border: 0;
+  background: var(--campo);
+  color: var(--testo);
+  transition:
+    background-color var(--dur-3) var(--ease-inversione),
+    color var(--dur-3) var(--ease-inversione);
+}
+
+.chapter--custody__scene {
+  position: relative;
+  min-height: 100svh;
+  padding-block: var(--space-21);
+  grid-template-rows: auto 1fr;
+}
+
+.chapter--custody__body {
+  min-height: 140svh;
+  padding-block: var(--space-21);
+  grid-template-rows: auto auto 1fr;
+}
+
+.chapter--custody__label {
+  grid-column: 2 / 8;
+  grid-row: 1;
+  color: var(--testo-2);
+}
+
+.chapter--custody__title {
+  grid-column: 1 / 7;
+  grid-row: 2;
+  align-self: center;
+  margin-top: var(--space-13);
+}
+
+.chapter--custody__title span {
+  display: block;
+}
+
+.chapter--custody__myth {
+  grid-column: 2 / 6;
+  grid-row: 1;
+  color: var(--indice);
+  max-width: var(--measure);
+}
+
+.chapter--custody__myth p + p {
+  margin-top: var(--space-5);
+}
+
+.chapter--custody__close {
+  grid-column: 2 / 6;
+  grid-row: 2;
+  margin-top: var(--space-21);
+}
+
+.chapter--custody__final {
+  grid-column: 6 / 8;
+  grid-row: 3;
+  align-self: end;
+  margin-top: var(--space-34);
+  color: var(--indice);
+}
+
+.chapter--custody__mark {
+  position: absolute;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  color: var(--indice);
+}
+
+.chapter--custody__mark::before,
+.chapter--custody__mark::after {
+  content: "";
+  position: absolute;
+  display: block;
+  background: currentColor;
+}
+
+.chapter--custody__mark::before {
+  top: 7px;
+  left: 0;
+  width: 6px;
+  height: 1px;
+  box-shadow: 10px 0 currentColor;
+}
+
+.chapter--custody__mark::after {
+  top: 0;
+  left: 7px;
+  width: 1px;
+  height: 6px;
+  box-shadow: 0 10px currentColor;
+}
+
+.chapter--custody__mark--tl {
+  top: var(--space-2);
+  left: var(--space-2);
+}
+
+.chapter--custody__mark--tr {
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
+.chapter--custody__mark--bl {
+  bottom: var(--space-2);
+  left: var(--space-2);
+}
+
+.chapter--custody__mark--br {
+  right: var(--space-2);
+  bottom: var(--space-2);
+}
+
+html[data-experience="enhanced"] .chapter--custody__mark {
+  clip-path: inset(50%);
+}
+
+html[data-rail-field="notte"] .rail__kernel[data-state="completed"],
+html[data-rail-field="notte"] .rail__kernel[data-state="active"] {
+  border-color: var(--esperide);
+  background: var(--esperide);
+}
+
+html[data-field="notte"] body::before {
+  opacity: 0;
+}
+
+html[data-field="notte"] .rail__kernel[data-state="completed"],
+html[data-field="notte"] .rail__kernel[data-state="active"] {
+  border-color: var(--indice);
+  background: var(--indice);
+}
+
+/* Contact and footer remain inside the night field. */
+
+.contact {
+  padding: 0;
+  background: var(--notte);
+  color: var(--carta);
+}
+
+.contact__inner {
+  min-height: 100svh;
+  padding-block: var(--space-21) var(--space-8);
+  grid-template-rows: auto 1fr auto;
+}
+
+.contact__head {
+  grid-column: 2 / 5;
+  grid-row: 1;
+}
+
+.contact__head > * + * {
+  margin-top: var(--space-3);
+}
+
+.contact__details {
+  grid-column: 4 / 8;
+  grid-row: 2;
+  align-self: center;
+  font-style: normal;
+}
+
+.contact__email,
+.contact__phone,
+.contact__address {
+  display: block;
+}
+
+.contact__email,
+.contact__phone,
+.contact__social a,
+.contact__legal a {
+  min-width: 40px;
+  min-height: 40px;
+  align-items: center;
+}
+
+.contact__email,
+.contact__phone,
+.contact__social a {
+  display: inline-flex;
+}
+
+.contact__legal a {
+  display: flex;
+}
+
+.contact__email {
+  overflow-wrap: anywhere;
+}
+
+.contact__phone,
+.contact__address {
+  margin-top: var(--space-3);
+  color: var(--testo-2);
+}
+
+.contact__social {
+  grid-column: 2 / 5;
+  grid-row: 3;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.contact__social li + li {
+  margin-top: var(--space-2);
+}
+
+.contact__legal {
+  grid-column: 5 / 8;
+  grid-row: 3;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  align-items: end;
+  color: var(--testo-2);
+}
+
+@media (max-width: 1279px) {
+  .chapter {
+    padding-block: var(--space-13);
+  }
+
+  .chapter--royal__head,
+  .chapter--rows__head,
+  .chapter--conservation__head,
+  .chapter--stone__head,
+  .chapter--products__head {
+    grid-column: 2 / 7;
+  }
+
+  .chapter--royal__mark {
+    grid-column: 6 / 8;
+  }
+
+  .chapter--royal__body,
+  .chapter--rows__body,
+  .chapter--conservation__body,
+  .chapter--field__body,
+  .chapter--stone__body {
+    grid-column: 2 / 6;
+  }
+
+  .chapter--royal__data,
+  .chapter--rows__data,
+  .chapter--conservation__data,
+  .chapter--field__data,
+  .chapter--stone__data {
+    grid-column: 2 / 8;
+    grid-row: auto;
+    margin-top: var(--space-13);
+  }
+
+  .chapter--field__head {
+    grid-column: 2 / 6;
+  }
+
+  .chapter--field__data {
+    grid-column: 5 / 8;
+    grid-row: 1;
+  }
+
+  .chapter--products__matrix {
+    grid-column: 3 / 8;
+  }
+
+  .product {
+    min-height: 480px;
+  }
+
+  .chapter--custody__title {
+    grid-column: 1 / 8;
+  }
+
+  .chapter--custody__myth,
+  .chapter--custody__close {
+    grid-column: 2 / 7;
+  }
+}
+
+@media (max-width: 767px) {
+  .scheda {
+    min-height: 112svh;
+  }
+
+  .chapter {
+    min-height: 120svh;
+    padding-block: var(--space-13);
+  }
+
+  .chapter__title {
+    margin-bottom: var(--space-3);
+  }
+
+  .chapter__standfirst {
+    margin-bottom: var(--space-3);
+  }
+
+  .chapter--royal,
+  .chapter--rows,
+  .chapter--conservation,
+  .chapter--field,
+  .chapter--stone,
+  .chapter--products {
+    grid-template-rows: none;
+  }
+
+  .chapter--royal__head,
+  .chapter--royal__body,
+  .chapter--royal__data,
+  .chapter--rows__head,
+  .chapter--rows__proof,
+  .chapter--rows__eight,
+  .chapter--rows__body,
+  .chapter--rows__data,
+  .chapter--conservation__head,
+  .chapter--conservation__year,
+  .chapter--conservation__body,
+  .chapter--conservation__data,
+  .chapter--field__head,
+  .chapter--field__data,
+  .chapter--field__body,
+  .chapter--field__chain,
+  .chapter--stone__head,
+  .chapter--stone__states,
+  .chapter--stone__body,
+  .chapter--stone__data,
+  .chapter--products__head,
+  .chapter--products__matrix,
+  .products,
+  .chapter--products__cta {
+    grid-column: 1 / 8;
+    grid-row: auto;
+  }
+
+  .chapter--royal__mark {
+    grid-column: 5 / 8;
+    grid-row: 2;
+    margin-top: var(--space-8);
+  }
+
+  .chapter--royal__body {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--rows__proof {
+    min-height: var(--space-21);
+    margin-top: var(--space-8);
+  }
+
+  .chapter--rows__proof b {
+    left: 2px;
+    font-size: 8px;
+  }
+
+  .chapter--rows__eight {
+    margin-top: var(--space-5);
+  }
+
+  .chapter--rows__body,
+  .chapter--rows__data {
+    margin-top: var(--space-8);
+  }
+
+  .chapter--conservation {
+    min-height: 152svh;
+  }
+
+  .chapter--conservation__year {
+    margin-top: var(--space-21);
+  }
+
+  .chapter--conservation__body {
+    margin-top: var(--space-34);
+  }
+
+  .chapter--conservation__data {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--field__data {
+    margin-top: var(--space-8);
+  }
+
+  .chapter--field__body,
+  .chapter--field__chain {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--stone__states {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+  }
+
+  .chapter--stone__cut {
+    display: none;
+  }
+
+  .chapter--stone__body,
+  .chapter--stone__data {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--products {
+    min-height: 320svh;
+  }
+
+  .chapter--products__matrix {
+    margin-top: var(--space-8);
+  }
+
+  .chapter--products__matrix span {
+    font-size: 8px;
+  }
+
+  .products {
+    display: block;
+    margin-top: var(--space-13);
+  }
+
+  .product {
+    min-height: 88svh;
+  }
+
+  .product + .product,
+  .product--maissini,
+  .product--farina {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--products__cta {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--custody {
+    min-height: 240svh;
+  }
+
+  .chapter--custody__scene,
+  .chapter--custody__body {
+    padding-block: var(--space-13);
+  }
+
+  .chapter--custody__label,
+  .chapter--custody__title,
+  .chapter--custody__myth,
+  .chapter--custody__close,
+  .chapter--custody__final {
+    grid-column: 1 / 8;
+  }
+
+  .chapter--custody__title {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--custody__myth,
+  .chapter--custody__close {
+    margin-top: var(--space-13);
+  }
+
+  .chapter--custody__final {
+    margin-top: var(--space-21);
+  }
+
+  .contact__inner {
+    padding-block: var(--space-13) var(--space-5);
+  }
+
+  .contact__head,
+  .contact__details,
+  .contact__social,
+  .contact__legal {
+    grid-column: 1 / 8;
+    grid-row: auto;
+  }
+
+  .contact__details {
+    margin-top: var(--space-13);
+  }
+
+  .contact__social {
+    margin-top: var(--space-13);
+  }
+
+  .contact__legal {
+    display: block;
+    margin-top: var(--space-8);
+  }
+
+  .contact__legal a {
+    display: block;
+    margin-top: var(--space-2);
+  }
+}
+
+/* Declared after the custody component so the zero-duration state wins the
+   cascade as well as the motion query. The palette change remains; only its
+   interpolation is removed. */
+@media (prefers-reduced-motion: reduce) {
+  .chapter--custody {
+    transition-duration: var(--dur-0);
+  }
+}

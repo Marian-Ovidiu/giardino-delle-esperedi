@@ -39,3 +39,37 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# testing & QA
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# scratch
+/.tmp/
+.verify-*.mjs
+
+# editors
+/.idea/
+/.vscode/
+*.swp
+
+# Local agent settings are machine-specific. The four project agents in
+# .claude/agents/ ARE tracked — they are part of the deliverable.
+.claude/settings.local.json
+
+# Higgsfield generation masters: 41MB of rejected candidates across Batch 0
+# and Batch 1R. The per-candidate rejection record lives in
+# docs/assets-manifest.md, which is what actually needs to survive.
+# Tracked deliberately: assets/refs/ (the locked colour reference every future
+# plate is graded against) and assets/archive/ (superseded but approved
+# derivatives, 148KB — the audit trail).
+/assets/masters/
+
+# 115MB of QA screenshots, regenerable with `npm run shots`.
+/docs/captures/
+
+# Original font downloads are retained locally only; the production sources
+# are the Latin WOFF2 files beside them.
+/src/assets/fonts/*.ttf

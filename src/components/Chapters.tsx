@@ -1,0 +1,263 @@
+import { RegistroDati } from "@/components/RegistroDati";
+import { StaticProloguePlate } from "@/components/StaticProloguePlate";
+import { chapters, cta, custodia, referenze } from "@/content/site";
+
+function ChapterHead({ index }: { index: number }) {
+  const chapter = chapters[index];
+  return (
+    <>
+      <p className="chapter__label t-data">Scheda {chapter.n}/08</p>
+      <h2 id={`t-${chapter.id}`} className="chapter__title t-d2">
+        {chapter.title}
+      </h2>
+      <p className="chapter__standfirst t-lead">{chapter.standfirst}</p>
+    </>
+  );
+}
+
+export function RoyalChapter() {
+  const chapter = chapters[1];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--royal field"
+      data-scheda={chapter.n}
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <StaticProloguePlate state="incisions" />
+      <div className="chapter--royal__head">
+        <ChapterHead index={1} />
+      </div>
+      <p className="chapter--royal__mark t-d0" aria-hidden="true">
+        II
+      </p>
+      <div className="chapter--royal__body">
+        {chapter.body.map((paragraph) => (
+          <p className="t-body" key={paragraph}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+      <div className="chapter--royal__data">
+        <RegistroDati rows={chapter.data} />
+      </div>
+    </section>
+  );
+}
+
+export function EightRowsChapter() {
+  const chapter = chapters[2];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--rows field"
+      data-scheda={chapter.n}
+      data-prologue-end
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <StaticProloguePlate state="incisions" release />
+      <div className="chapter--rows__head">
+        <ChapterHead index={2} />
+      </div>
+      <div className="chapter--rows__proof" aria-label="Otto file">
+        {Array.from({ length: 8 }, (_, index) => (
+          <span key={index}>
+            <b className="t-data">{String(index + 1).padStart(2, "0")}</b>
+          </span>
+        ))}
+      </div>
+      <p className="chapter--rows__eight t-d0" aria-hidden="true">
+        8
+      </p>
+      <div className="chapter--rows__body">
+        {chapter.body.map((paragraph) => (
+          <p className="t-body" key={paragraph}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+      <div className="chapter--rows__data">
+        <RegistroDati rows={chapter.data} />
+      </div>
+    </section>
+  );
+}
+
+export function ConservationChapter() {
+  const chapter = chapters[3];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--conservation field"
+      data-scheda={chapter.n}
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <div className="chapter--conservation__head">
+        <ChapterHead index={3} />
+      </div>
+      <p className="chapter--conservation__year t-num-lg">2007</p>
+      <div className="chapter--conservation__body">
+        {chapter.body.map((paragraph) => (
+          <p className="t-body" key={paragraph}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+      <div className="chapter--conservation__data">
+        <RegistroDati rows={chapter.data} />
+      </div>
+    </section>
+  );
+}
+
+export function FieldChapter() {
+  const chapter = chapters[4];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--field field"
+      data-scheda={chapter.n}
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <div className="chapter--field__head">
+        <ChapterHead index={4} />
+      </div>
+      <div className="chapter--field__data">
+        <RegistroDati rows={chapter.data} />
+      </div>
+      <div className="chapter--field__body">
+        {chapter.body.map((paragraph) => (
+          <p className="t-body" key={paragraph}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+      <p className="chapter--field__chain t-data" aria-label="Filiera aziendale">
+        Semina <span aria-hidden="true">→</span> raccolta <span aria-hidden="true">→</span>{" "}
+        trasformazione
+      </p>
+    </section>
+  );
+}
+
+export function StoneChapter() {
+  const chapter = chapters[5];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--stone field"
+      data-scheda={chapter.n}
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <div className="chapter--stone__head">
+        <ChapterHead index={5} />
+      </div>
+      <div className="chapter--stone__states" aria-label="Trasformazione dal chicco alla farina">
+        <p>
+          <span className="t-label">Stato 01</span>
+          <strong className="t-d2">Chicco</strong>
+        </p>
+        <span className="chapter--stone__cut t-num-lg" aria-hidden="true">
+          /
+        </span>
+        <p>
+          <span className="t-label">Stato 02</span>
+          <strong className="t-d2">Farina</strong>
+        </p>
+      </div>
+      <div className="chapter--stone__body">
+        {chapter.body.map((paragraph) => (
+          <p className="t-body" key={paragraph}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+      <div className="chapter--stone__data">
+        <RegistroDati rows={chapter.data} />
+      </div>
+    </section>
+  );
+}
+
+export function ProductsChapter() {
+  const chapter = chapters[6];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--products field"
+      data-scheda={chapter.n}
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <div className="chapter--products__head">
+        <ChapterHead index={6} />
+      </div>
+      <div className="chapter--products__matrix" aria-label="Matrice varietale: otto file">
+        {Array.from({ length: 8 }, (_, index) => (
+          <span className="t-data" key={index}>
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        ))}
+      </div>
+      <ol className="products">
+        {referenze.map((product) => (
+          <li className={`product product--${product.id}`} key={product.id}>
+            <p className="product__index">
+              <span className="t-label">Referenza</span>
+              <span className="t-num">{product.index}/03</span>
+            </p>
+            <h3 className="product__name t-d3">{product.name}</h3>
+            <p className="product__definition t-body">{product.definition}</p>
+            {product.format && (
+              <dl className="product__format">
+                <dt className="t-label">Peso netto</dt>
+                <dd className="t-data-lg">{product.format}</dd>
+              </dl>
+            )}
+            {product.extra && <p className="product__extra t-small">{product.extra}</p>}
+          </li>
+        ))}
+      </ol>
+      <a className="chapter--products__cta t-label-lg" href={cta.href}>
+        {cta.label}
+      </a>
+    </section>
+  );
+}
+
+export function CustodyChapter() {
+  const chapter = chapters[7];
+  return (
+    <section
+      id={chapter.id}
+      className="chapter chapter--custody"
+      data-scheda={chapter.n}
+      data-field="notte"
+      data-field-section="notte"
+      aria-labelledby={`t-${chapter.id}`}
+    >
+      <div className="chapter--custody__scene field" data-custody-pin>
+        <span className="chapter--custody__mark chapter--custody__mark--tl" aria-hidden="true" />
+        <span className="chapter--custody__mark chapter--custody__mark--tr" aria-hidden="true" />
+        <span className="chapter--custody__mark chapter--custody__mark--bl" aria-hidden="true" />
+        <span className="chapter--custody__mark chapter--custody__mark--br" aria-hidden="true" />
+        <p className="chapter--custody__label t-data">{custodia.label}</p>
+        <h2 id={`t-${chapter.id}`} className="chapter--custody__title t-d1">
+          {custodia.display.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </h2>
+      </div>
+      <div className="chapter--custody__body field">
+        <div className="chapter--custody__myth">
+          {custodia.body.map((paragraph) => (
+            <p className="t-d3 t-italic" key={paragraph}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        <p className="chapter--custody__close t-d3">{custodia.close}</p>
+        <p className="chapter--custody__final t-label-lg">{custodia.final}</p>
+      </div>
+    </section>
+  );
+}
