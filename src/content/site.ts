@@ -17,7 +17,7 @@
  *   · `senza glutine` must never appear.
  */
 
-import { company, origins, products } from "./facts";
+import { company, grain, origins, products } from "./facts";
 
 export interface DataRow {
   label: string;
@@ -64,7 +64,10 @@ export const chapters: readonly Chapter[] = [
     standfirst: "Mais Rosso Ottofile, varietà Albese.",
     body: [
       "Una varietà dell'Albese tra quelle a maggior rischio di estinzione in Piemonte.",
-      "Il Giardino delle Esperidi la semina, la raccoglie e la trasforma a Cherasco, in un'oasi protetta tra Langhe e Cuneese.",
+      // Was "la semina, la raccoglie e la trasforma". Same three verbs, now
+      // with the three process facts the client states in writing: in purezza,
+      // a mano, al sole.
+      "Il Giardino delle Esperidi la semina in purezza, la raccoglie a mano e la essicca al sole, a Cherasco, in un'oasi protetta tra Langhe e Cuneese.",
     ],
     data: [
       { label: "Specie", value: "Mais" },
@@ -72,6 +75,7 @@ export const chapters: readonly Chapter[] = [
       { label: "Appellativo", value: "il mais del Re" },
       { label: "Località", value: "Cherasco (CN), Piemonte" },
       { label: "File di chicchi", value: "8" },
+      { label: "Colore del chicco", value: grain.kernel.color },
       { label: "Stato", value: "a rischio di estinzione" },
     ],
     railFact: "Mais Rosso Ottofile, varietà Albese",
@@ -82,11 +86,18 @@ export const chapters: readonly Chapter[] = [
     title: "Il mais del Re",
     standfirst: "Una tradizione aziendale lo lega a Vittorio Emanuele II.",
     body: [
-      "Il soprannome «mais del Re» accompagna ancora oggi la varietà. Il Giardino delle Esperidi ne racconta l'origine come una disposizione di semina attribuita a Vittorio Emanuele II.",
+      // The attribution is the whole point of this sentence and it stays. The
+      // brochure and the letter both tell the story as history — "fu Re
+      // Vittorio Emanuele II ad imporne la semina" — and the site does not.
+      // Pollenzo and the hills sit INSIDE the attributed clause, where they
+      // are part of what the company recounts rather than part of the record.
+      "Il soprannome «mais del Re» accompagna ancora oggi la varietà. Il Giardino delle Esperidi ne racconta l'origine come una disposizione di semina attribuita a Vittorio Emanuele II, sulle colline piemontesi e nella tenuta di Pollenzo.",
     ],
     data: [
       { label: "Fonte", value: "tradizione aziendale" },
       { label: "Appellativo", value: "il mais del Re" },
+      // The name in Piedmontese, as the company writes it. A name, not a claim.
+      { label: "In piemontese", value: grain.dialectName },
       { label: "Coltivato in", value: "Piemonte" },
       { label: "Fino a", value: "metà del secolo scorso" },
     ],
@@ -134,11 +145,17 @@ export const chapters: readonly Chapter[] = [
     standfirst: "Agricoltura simbiotica.",
     body: [
       "Il Giardino delle Esperidi dichiara di adottare il metodo dell'agricoltura simbiotica.",
-      "La filiera aziendale comprende semina, raccolta e trasformazione.",
+      // The letter's own words, and the most useful commercial fact in it:
+      // there is no warehouse behind this, so the range moves with the year.
+      "La filiera va dalla semina alla confezione, senza intermediari. La disponibilità è legata al raccolto.",
     ],
     data: [
       { label: "Metodo dichiarato", value: "agricoltura simbiotica" },
-      { label: "Filiera", value: "semina · raccolta · trasformazione" },
+      {
+        label: "Filiera",
+        value: "semina · raccolta a mano · essiccazione al sole · trasformazione",
+      },
+      { label: "Intermediari", value: "nessuno, dal campo alla confezione" },
       { label: "Ambiente", value: "oasi protetta tra Langhe e Cuneese" },
     ],
     caption: "Semente.",
@@ -151,13 +168,19 @@ export const chapters: readonly Chapter[] = [
     standfirst: "Macinata a pietra. Integrale.",
     body: [
       "La Farina di Mais Rosso è integrale e macinata a pietra.",
-      "Dalla stessa varietà nascono farina, gallette e grissini.",
+      // Was "farina, gallette e grissini" — written when the site held three
+      // maize references and false the day Maisotti and La Maisèra arrived.
+      // No number: the sentence lists transformations, and the list is open.
+      "Dalla stessa varietà nascono farina, gallette, grissini, biscotti e birra.",
     ],
     data: [
       { label: "Molitura", value: "a pietra" },
       { label: "Tipo", value: "integrale" },
       { label: "Varietà", value: "Ottofile · Albese" },
       { label: "Formato", value: "500 g" },
+      // The jar is on the label and it is the reason the flour keeps its
+      // colour on a shelf. A fact about the packaging, not a virtue.
+      { label: "Confezione", value: "vasetto in vetro sottovuoto" },
     ],
     caption: "Farina macinata a pietra.",
     railFact: "macinata a pietra, integrale",
@@ -174,6 +197,10 @@ export const chapters: readonly Chapter[] = [
       // Previously named the orto botanico as the Amaro's source. Removed:
       // the only cultivation the client can confirm is the Mais Rosso.
       "Il Mais Rosso Ottofile è la materia prima principale del Giardino. Ogni scheda dichiara da che cosa nasce, e dove l'origine non è ancora confermata la scheda lo dice.",
+      // The nomenclature fact the packaging makes obvious and the site never
+      // said: the maize line has its own mark. Company name and brand name are
+      // two different things, and the register should not blur them.
+      "Le referenze di mais escono con il marchio Mais Rosso Co. I prezzi sono quelli del listino aziendale; l'acquisto passa dall'azienda.",
       "Il catalogo è aperto. Alcune schede sono ancora parziali.",
     ],
     data: [],
@@ -202,11 +229,15 @@ export const referenze = products.map((p, i) => ({
   /** Ordinal only. NEVER "01/03" — the total is not part of the concept. */
   index: String(i + 1).padStart(2, "0"),
   originLabel: origins[p.origin],
-  /** Only the flour carries the polenta note — it is the only one on record. */
-  extra:
-    p.id === "farina"
-      ? "Per polenta: tradizionale, minimo 60 minuti di cottura, oppure col Bimby."
-      : null,
+  /**
+   * What the reference is for, one line, from `facts.ts`.
+   *
+   * This used to be a hard-coded polenta note on the flour, with a cooking
+   * time that three client sources gave three different values for. It is now
+   * a field on the product, so a use arrives with the product instead of with
+   * a condition in this file — and stays absent where nothing is on record.
+   */
+  extra: p.use ?? null,
   /**
    * Pre-addressed enquiry, so the reader never composes a cold email.
    * Built from `company.email` rather than `cta.href`: `cta` is declared
@@ -222,8 +253,8 @@ export const catalogo = {
   entryLabel: "Referenza",
   originLabel: "Origine",
   /**
-   * "Formato", not "Peso netto": the catalogue now holds both mass (500 g) and
-   * volume (0,75 L), and labelling a volume as a weight is simply wrong.
+   * "Formato", not "Peso netto": the catalogue holds both mass (500 g) and
+   * volume (33 cl), and labelling a volume as a weight is simply wrong.
    * "Formato" is already the term used in chapter 06's register rows.
    */
   formatLabel: "Formato",
@@ -397,5 +428,5 @@ export const a11y = {
 export const meta = {
   title: "Il Giardino delle Esperidi — Mais Rosso Ottofile, varietà Albese",
   description:
-    "Registro del Mais Rosso Ottofile Integrale, varietà Albese: otto file di chicchi e una varietà a rischio di estinzione. Maisette, Maissini e Farina di Mais Rosso.",
+    "Registro del Mais Rosso Ottofile Integrale, varietà Albese: otto file di chicchi, seminato in purezza, raccolto a mano ed essiccato al sole a Cherasco. Farina, Maisette, Maissini, Maisotti e la birra agricola La Maisèra 8file.",
 } as const;

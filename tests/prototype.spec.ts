@@ -516,24 +516,41 @@ test.describe("OTTO full experience", () => {
       await expect(entry.locator(".product__data dd").first()).not.toBeEmpty();
     }
 
-    // Verified facts appear exactly where they are on record.
-    const byName = (name: string) => products.filter({ hasText: name }).first();
-    await expect(byName("Maisette")).toContainText("120 g");
-    await expect(byName("Farina di Mais Rosso")).toContainText("500 g");
-    await expect(byName("Maissini")).toContainText("Grissini di mais");
+    // Verified facts appear exactly where they are on record. Products are
+    // addressed by id, not by visible name: names come off the packaging and
+    // the packaging renamed one of them mid-project.
+    const byId = (id: string) => page.locator(`[data-product="${id}"]`);
+    await expect(byId("maisette")).toContainText("120 g");
+    await expect(byId("farina")).toContainText("500 g");
+    await expect(byId("maissini")).toContainText("Grissini di mais");
 
-    // Maissini has no client-confirmed format: the row is omitted, never
-    // dashed and never invented.
-    await expect(byName("Maissini").getByText("Formato")).toHaveCount(0);
+    /*
+     * Maissini's net weight was unknown and its Formato row was asserted
+     * ABSENT here. The 2026 priced brochure prints 200 g, so the row now
+     * exists and the assertion is inverted rather than deleted: the point was
+     * never "no format", it was "no invented format".
+     */
+    await expect(byId("maissini")).toContainText("200 g");
 
-    // Birra is a full member of the maize family: brewed with the company's
-    // own Mais Rosso, and sold in two sizes shown on one register row.
-    const birra = products.filter({ hasText: "Birra" }).first();
+    // Maisotti shipped on the client's shelf and in their brochure while this
+    // site had no entry for it at all. It is a full record now.
+    await expect(byId("maisotti")).toHaveAttribute("data-status", "completo");
+    await expect(byId("maisotti")).toContainText("250 g");
+
+    /*
+     * The beer is a full member of the maize family. Its record was
+     * "completo" on two formats and a bare definition; the printed label has
+     * since replaced that with a name, a style, a strength and ONE format.
+     * 0,75 L is gone: the letter claims it, the bottle contradicts it, and the
+     * register follows the bottle.
+     */
+    const birra = byId("birra");
     await expect(birra).toHaveAttribute("data-status", "completo");
     await expect(birra).not.toContainText("Scheda in preparazione");
     await expect(birra).toContainText("Mais Rosso Ottofile");
-    await expect(birra).toContainText("0,33 L");
-    await expect(birra).toContainText("0,75 L");
+    await expect(birra.locator(".product__name")).toHaveText("La Maisèra 8file");
+    await expect(birra).toContainText("33 cl");
+    await expect(birra).not.toContainText("75 cl");
     await expect(birra.locator(".product__cta")).toHaveCount(1);
 
     // The Amaro's provenance is unknown, and the register says so rather than
@@ -617,9 +634,17 @@ test.describe("OTTO full experience", () => {
   test("keeps the maize the protagonist of the Birra, not the brewery", async ({ page }) => {
     const text = (await page.locator("#referenze").innerText()).toLowerCase();
 
-    // Whole words only. Substring matching is wrong here and quietly gives a
-    // false positive: "ipa" is inside "princ-ipa-le", and the standfirst says
-    // "una materia prima principale".
+    /*
+     * These styles are still not on record and still banned. What CHANGED on
+     * 2026-07-28 is that one style is: the bottle prints "BIÈRE DE GARDE –
+     * FARMHOUSE", so that one is a printed fact rather than a guess and is
+     * asserted positively below. The list is not weakened to let it through —
+     * it never contained it.
+     *
+     * Whole words only. Substring matching is wrong here and quietly gives a
+     * false positive: "ipa" is inside "princ-ipa-le", and the standfirst says
+     * "una materia prima principale".
+     */
     const styles = ["ipa", "blonde", "amber", "lager", "pilsner", "weiss", "stout"];
     for (const style of styles) {
       expect(text, `brewing style "${style}" is not on record`).not.toMatch(
@@ -627,17 +652,92 @@ test.describe("OTTO full experience", () => {
       );
     }
 
-    // Neither the brewer nor the technical spec sheet belongs here.
-    const banned = ["ibu", "birrificio", "brewery", "malto", "abv", "gradazione"];
+    /*
+     * Neither the brewer nor the technical spec sheet belongs here. "gradazione"
+     * stays banned even though the strength is now printed on the label: the
+     * label's own word is "ALCOOL 7% VOL.", and a register uses the wording on
+     * the pack rather than the vocabulary of a tasting sheet.
+     *
+     * "castelletto" and "accise" are new. The label carries the contract
+     * brewery's name, address and excise code in its small print; none of that
+     * is this company's, and none of it goes on this company's site.
+     */
+    const banned = [
+      "ibu",
+      "birrificio",
+      "brewery",
+      "malto",
+      "abv",
+      "gradazione",
+      "castelletto",
+      "accise",
+    ];
     for (const word of banned) {
       expect(text, `"${word}" must not appear`).not.toMatch(new RegExp(`\\b${word}\\b`));
     }
     // Stem match: luppolo / luppoli / luppolato.
     expect(text).not.toContain("luppol");
 
-    // What must be there is the agricultural origin.
+    // What must be there is the agricultural origin, and now also what the
+    // bottle itself declares.
     const birra = page.locator('[data-product="birra"]');
     await expect(birra.locator(".product__data")).toContainText("Mais Rosso Ottofile");
+    await expect(birra.locator(".product__data")).toContainText("Bière de Garde");
+    await expect(birra.locator(".product__data")).toContainText("7% vol.");
+  });
+
+  test("prints prices as register data and never as an offer", async ({ page }) => {
+    /*
+     * The client publishes a priced list, so the register prints the prices —
+     * in the same voice as a net weight, in the same generic spec row, in the
+     * same type. What it must never grow is the apparatus of a shop: this
+     * company does not sell online, and a price with a button beside it says
+     * that it does.
+     */
+    const referenze = page.locator("#referenze");
+    await expect(referenze).toContainText("€ 3,90");
+    await expect(referenze).toContainText("€ 5,50");
+
+    const text = (await referenze.innerText()).toLowerCase();
+    for (const banned of [
+      "compra",
+      "acquista ora",
+      "aggiungi",
+      "carrello",
+      "checkout",
+      "sconto",
+      "offerta",
+      "promo",
+      "spedizione",
+      "iva inclusa",
+    ]) {
+      expect(text, `"${banned}" must not appear beside a price`).not.toContain(banned);
+    }
+
+    // The only action on a product row is still the enquiry, once per row.
+    const rows = page.locator(".product");
+    const count = await rows.count();
+    for (let i = 0; i < count; i += 1) {
+      await expect(rows.nth(i).locator("a")).toHaveCount(1);
+    }
+  });
+
+  test("makes no gluten-free claim anywhere, in either direction", async ({ page }) => {
+    /*
+     * The presentation letter calls the Maisette "senza glutine per natura"
+     * and the maize "naturalmente privo di glutine". Both refused: the claim
+     * is regulated, needs a verified analysis under 20 ppm on the finished
+     * product, and this range includes wheat flour, barley and a beer whose
+     * own label declares gluten-containing cereals.
+     *
+     * The allergen rows that DO ship are the opposite move — a declaration off
+     * a printed ingredient list — and this test guards both directions at once.
+     */
+    const text = (await page.locator("main").innerText()).toLowerCase();
+    for (const phrase of ["senza glutine", "privo di glutine", "gluten free", "glutine free"]) {
+      expect(text, `"${phrase}" is not verified and may never appear`).not.toContain(phrase);
+    }
+    await expect(page.locator('[data-product="maissini"]')).toContainText("contiene glutine");
   });
 
   test("carries no copy that hard-codes the size of the range", async ({ page }) => {

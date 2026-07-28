@@ -6,8 +6,18 @@
  *
  * Nothing may be added to this file that is not verified. No formats, weights,
  * certifications, awards, statistics or prices beyond what is recorded here.
- * The old public website lists a superseded product range (18g monoporzione,
- * tubo, multipack) — that data is obsolete and must not be reintroduced.
+ *
+ * ── 2026-07-28 · brand alignment ─────────────────────────────────────────
+ * Rebuilt against the client's own 2026 materials: the priced brochure, the
+ * presentation letter, and the printed label of La Maisèra 8file. Those three
+ * are now the authority on nomenclature, formats, prices and commercial
+ * detail; the project documentation stays the authority on layout and art
+ * direction. Full record in docs/brand-alignment.md.
+ *
+ * The note that used to stand here — that the 18 g monoporzione and the tubo
+ * were superseded data from the old public website — was itself out of date.
+ * Both are printed in the 2026 priced brochure. They are back, as FORMATS of
+ * Maisette and never as separate products.
  */
 
 export const company = {
@@ -24,8 +34,13 @@ export const company = {
   phoneHref: "tel:+393382866127",
   social: {
     instagram: {
-      handle: "il_giardino_delle_esperidi",
-      url: "https://www.instagram.com/il_giardino_delle_esperidi/",
+      /*
+       * Updated 2026-07-28 from the back page of the priced brochure, which
+       * prints the handle beside the QR code. The old
+       * `il_giardino_delle_esperidi` is superseded.
+       */
+      handle: "mais_rosso_company",
+      url: "https://www.instagram.com/mais_rosso_company/",
     },
     facebook: {
       handle: "GiardinodelleEsperidiShop",
@@ -46,15 +61,33 @@ export const grain = {
   fullName: "Mais Rosso Ottofile Integrale",
   variety: "Albese",
   nickname: "il mais del Re",
+  /** As the company tells it, in Piedmontese. Presentation letter, 2026. */
+  dialectName: "la melia du re",
+  /** The brand printed on the maize line's packaging. Not the company name. */
+  brand: "Mais Rosso Co.",
   /** Exactly eight — the structural fact the whole design is built on. */
   rows: 8,
   kernel: {
     shape: "arrotondata",
-    color: "arancio",
+    /* The client's own description, presentation letter 2026. More precise
+       than the "arancio" it replaces, and it is a colour, not a claim. */
+    color: "tra l'arancio bruciato e il bordeaux",
+  },
+  /**
+   * The cultivation steps the client states in writing. Process facts, not
+   * adjectives — and the reason "coltivato con cura" appears nowhere.
+   * NOT included and not to be added: the yield, the hectares, the sowing
+   * date, and the named associations and universities the letter also lists
+   * (see docs/brand-alignment.md §5 — third parties are not ours to name).
+   */
+  process: {
+    sowing: "seminato in purezza",
+    harvest: "raccolto a mano",
+    drying: "essiccato al sole",
   },
 } as const;
 
-export type ProductId = "farina" | "maisette" | "maissini" | "birra" | "amaro";
+export type ProductId = "farina" | "maisette" | "maissini" | "maisotti" | "birra" | "amaro";
 
 export interface Product {
   id: ProductId;
@@ -66,6 +99,16 @@ export interface Product {
    */
   definition: string | null;
   /**
+   * What it is for, in one line. The brochure's own answer, stripped of its
+   * adjectives: "perfette come snack o base per spalmabili" becomes "al
+   * naturale, o come base per spalmabili".
+   *
+   * Absent where the client says nothing. It renders in the small register
+   * line under the definition — the slot the polenta note already used, which
+   * was hard-coded to the flour before this field existed.
+   */
+  use?: string;
+  /**
    * Net contents as printed, one entry per size on the shelf. Empty where the
    * client has not confirmed any — never filled with a placeholder or a dash.
    */
@@ -73,10 +116,21 @@ export interface Product {
   /**
    * Additional register rows, rendered generically in declaration order.
    *
-   * This is the extension point. Style, strength, IBU, ingredients — anything
-   * the client later confirms — is added here and appears in the layout with
-   * no change to the component or the CSS. Nothing may be added speculatively:
-   * an absent row is the correct rendering of an unknown fact.
+   * This is the extension point, and 2026-07-28 is what it was built for:
+   * style, strength, packaging, quantitative ingredient declarations, allergen
+   * notes and PRICES all arrived at once and all render here with no change to
+   * the component or the CSS.
+   *
+   * On prices. They appear because the client publishes them in a priced
+   * brochure, and they are set in the same voice as a net weight — a row in a
+   * register, never an offer. There is no cart, no "Compra", no availability
+   * statement and no shipping. Deleting the price row must never break
+   * anything; nothing may be built that assumes one exists.
+   *
+   * `label` is the React key, so two rows may not share one.
+   *
+   * Nothing may be added speculatively: an absent row is the correct
+   * rendering of an unknown fact.
    */
   specs?: readonly Spec[];
   /** What the product is transformed from. */
@@ -138,13 +192,45 @@ export const origins: Record<Origin, string> = {
  *
  * Client-confirmed packaging is authoritative over the outdated public
  * website. Maissini are GRISSINI (breadsticks) — never a gallette format.
+ *
+ * ── The gluten line, and why it is drawn here ────────────────────────────
+ * The presentation letter calls Maisette "senza glutine per natura" and the
+ * letter's opening calls the maize itself "naturalmente privo di glutine".
+ * REFUSED, and not negotiable: `senza glutine` is a regulated statement that
+ * requires a verified analysis below 20 ppm on the finished product, and a
+ * leaflet asserting it is not that analysis. It is also dangerous in this
+ * particular range — Maissini carry wheat flour and barley malt, Maisotti
+ * carry wheat flour, and the beer's own label reads "prodotto con cereali
+ * contenenti glutine". A gluten-free claim anywhere near these five would be
+ * read across all of them.
+ *
+ * The allergen rows below go the other way, and only where the printed
+ * ingredient list supports them. Their ABSENCE on Maisette and on the Farina
+ * is not a statement: it means no ingredient list for those two is on file.
+ * Nobody may infer, or add, a gluten-free claim from that silence.
+ * TODO(cliente): analisi glutine su Maisette e Farina, se si vuole dichiarare
+ * qualcosa. Fino ad allora la riga resta assente in entrambe le direzioni.
  */
 export const products: readonly Product[] = [
   {
     id: "farina",
     name: "Farina di Mais Rosso",
     definition: "Ottofile Integrale varietà Albese, macinata a pietra",
+    /*
+     * TODO(cliente): tempo di cottura della polenta. Tre fonti, tre numeri —
+     * la brochure 2026 dice 30 minuti, la lettera di presentazione ne dice 40,
+     * il vecchio sito pubblico diceva "minimo 60". Il registro non pubblica un
+     * dato che si contraddice da solo: la riga tace finché il cliente non
+     * sceglie. Le sei porzioni sono invece confermate e non contraddette.
+     */
+    use: "Per la polenta: sei porzioni da un vasetto.",
     formats: ["500 g"],
+    specs: [
+      // The jar is the product's distinguishing detail, and it is a physical
+      // fact printed on the label, not a sustainability claim.
+      { label: "Confezione", value: "vasetto in vetro sottovuoto" },
+      { label: "Prezzo", value: "1 pz € 5,50 · 2 pz € 10,00" },
+    ],
     origin: "mais",
     status: "completo",
   },
@@ -152,7 +238,18 @@ export const products: readonly Product[] = [
     id: "maisette",
     name: "Maisette",
     definition: "Gallette di Mais Rosso Ottofile Integrale",
-    formats: ["120 g"],
+    use: "Al naturale, o come base per spalmabili.",
+    /*
+     * Two formats, one product. The 18 g monoporzione is a FORMAT of Maisette
+     * and never a separate entry: the priced brochure sets it under the same
+     * heading, and splitting it would inflate the range by one.
+     */
+    formats: ["120 g", "18 g"],
+    specs: [
+      { label: "Confezione", value: "tubo da 120 g · monoporzione salva freschezza da 18 g" },
+      { label: "Prezzo", value: "1 pz € 3,90 · 3 pz € 9,90" },
+      { label: "Prezzo monoporzione", value: "50 pz € 45,00" },
+    ],
     origin: "mais",
     status: "completo",
   },
@@ -160,28 +257,82 @@ export const products: readonly Product[] = [
     id: "maissini",
     name: "Maissini",
     definition: "Grissini di mais, prodotti con farina di Mais Rosso Ottofile",
-    // Net weight not confirmed by the client. The row is omitted rather than
-    // dashed: a dash in a format field reads as "no format".
-    formats: [],
+    use: "Per l'aperitivo e per il cestino del pane.",
+    // 200 g, printed in the 2026 priced brochure. The weight was unknown when
+    // this record was written and the row was omitted rather than dashed; it
+    // is now on file, and the record is complete.
+    formats: ["200 g"],
+    specs: [
+      { label: "Prezzo", value: "1 pz € 3,90 · 3 pz € 9,90" },
+      // From the printed ingredient list. Stated, not implied — and it is the
+      // exact counterweight to the refused "senza glutine".
+      { label: "Allergeni", value: "contiene glutine (frumento, orzo)" },
+    ],
     origin: "mais",
-    status: "parziale",
+    status: "completo",
+  },
+  {
+    id: "maisotti",
+    name: "Maisotti",
+    /*
+     * ADDED 2026-07-28. The product existed on the client's shelf and in their
+     * priced brochure and appeared nowhere on this site — the single largest
+     * factual gap the brand review found.
+     */
+    definition: "Biscotti con farina integrale di Mais Rosso Ottofile e miele",
+    use: "Per la colazione e la merenda. Reggono l'inzuppo.",
+    formats: ["250 g"],
+    specs: [
+      // A quantitative ingredient declaration off the printed list. It is the
+      // most concrete thing that can be said about this biscuit, and it is not
+      // a nutrition claim: it declares how much maize is in it, nothing more.
+      { label: "Mais Rosso", value: "26,7%" },
+      { label: "Prezzo", value: "1 pz € 5,50 · 2 pz € 10,00" },
+      { label: "Allergeni", value: "contiene glutine (frumento), uova, latte" },
+    ],
+    origin: "mais",
+    status: "completo",
   },
   {
     id: "birra",
-    name: "Birra",
     /*
-     * Client-confirmed: brewed with the company's own Mais Rosso Ottofile, and
-     * therefore a full member of the maize family rather than an outlier.
+     * RENAMED 2026-07-28. The site called it "Birra". The bottle calls it
+     * LA MAISÈRA · 8file, and the label is the authority on a product's name.
+     * The letter records where the name comes from: `maisèra` is Piedmontese
+     * for the granary, the room where the maize is kept.
      *
-     * The definition leads with the raw material, exactly like the other four,
-     * because the protagonist is the maize and not the brewery. Deliberately
-     * ABSENT and not to be added without written confirmation: the brewing
-     * style (never "IPA", "Blonde", "Amber" or "Lager"), the strength, the IBU,
-     * the ingredient list, and any mention of who brews it. When any of those
-     * are confirmed they go in `specs` below and render with no code change.
+     * What the printed label now puts ON the record, and what stays OFF it:
+     *   ON  — style (Bière de Garde, farmhouse), 33 cl, 7% vol., the tasting
+     *         note, the natural sediment, the gluten statement.
+     *   OFF — the IBU, which is nowhere; the full ingredient list, because a
+     *         register entry is not a spec sheet; and above all the contract
+     *         brewery printed in the small type, which is not this company's
+     *         name and does not go on this company's site.
+     *
+     * The definition still leads with the maize. The protagonist is the field.
      */
-    definition: "Prodotta con il Mais Rosso Ottofile coltivato in azienda",
-    formats: ["0,33 L", "0,75 L"],
+    name: "La Maisèra 8file",
+    definition: "Birra agricola al Mais Rosso Ottofile varietà Albese, coltivato in azienda",
+    use: "Da tavola. Formaggi stagionati, brasati, polenta.",
+    /*
+     * 33 cl, as printed on the label on file. The presentation letter says the
+     * beer is bottled at 75 cl, which contradicts the bottle itself; the label
+     * wins, because it is the physical artefact and because the 7% vol. below
+     * is measured on it. The site previously listed both 0,33 L and 0,75 L and
+     * now lists one — a deliberate reduction, not an oversight.
+     * TODO(cliente): esiste davvero un formato da 75 cl? Se sì servono
+     * l'etichetta e il grado alcolico di quel formato, che può differire.
+     */
+    formats: ["33 cl"],
+    specs: [
+      // Printed on the label. The unverified styles stay banned: there is a
+      // test, and "Bière de Garde" passes it because it is on the bottle.
+      { label: "Stile", value: "Bière de Garde · farmhouse" },
+      { label: "Alcool", value: "7% vol." },
+      { label: "Note", value: "tostato, pane, miele leggero" },
+      { label: "In bottiglia", value: "contiene deposito naturale" },
+      { label: "Allergeni", value: "prodotta con cereali contenenti glutine" },
+    ],
     origin: "mais",
     status: "completo",
   },
@@ -189,6 +340,29 @@ export const products: readonly Product[] = [
     id: "amaro",
     name: "Amaro del Dottore",
     /*
+     * KEPT, 2026-07-28, after investigation — and the investigation is worth
+     * recording, because the first answer was to remove it.
+     *
+     * It appears in NONE of the 2026 materials: not in the brochure's "I
+     * nostri prodotti", not in the presentation letter, and the letter counts
+     * the range out loud as "Cinque prodotti". On that evidence alone this
+     * entry looks superseded.
+     *
+     * It is not. It is standing on the table in the client's own brochure
+     * photograph on page 4 — a botanical label reading AMARO DEL DOTTORE ·
+     * CRAFT BITTER, carrying the Giardino delle Esperidi tree seal. So the
+     * product is real and it is theirs; it is simply not part of the Mais
+     * Rosso Co. line, which is what those five products are. This site is the
+     * company's register, not the maize line's catalogue, and deleting a real
+     * product because a maize brochure did not list it would be a worse error
+     * than carrying a partial record.
+     *
+     * "Craft bitter" is legible on that label and is deliberately NOT written
+     * into the record below: a category read off a low-resolution photograph
+     * of a bottle on a table is not a confirmation.
+     * TODO(cliente): l'Amaro del Dottore fa parte della gamma? Se sì servono
+     * formato, gradazione e composizione; se no, questa voce esce dal registro.
+     *
      * The product and its name are confirmed. NOTHING about its provenance is.
      *
      * This card previously read "Prodotto con le erbe officinali dell'orto

@@ -11,10 +11,20 @@
  * nothing at all. The page never reflows when an asset is replaced.
  *
  * ── What these images are ────────────────────────────────────────────────
- * Narrative, not documentary. They are material studies that set a register
- * and a rhythm. They are NOT records of this company's fields, harvests,
- * equipment or people, and nothing in the alt text or captions may suggest
- * they are.
+ * Two kinds now live here, and the `src` path says which is which.
+ *
+ * `/images/generated/piastre/…` — narrative, not documentary. Material studies
+ * that set a register and a rhythm. They are NOT records of this company's
+ * fields, harvests, equipment or people, and nothing in the alt text or
+ * captions may suggest they are. They carry `status: "provvisorio"` and the
+ * interface annotates them.
+ *
+ * `/images/foto/…` — the client's OWN photographs, from the 2026 brochure and
+ * presentation letter, cropped and graded by scripts/build-brand.mjs. These
+ * are documentary, and they are the only images on the site that may show the
+ * real packaging. Their captions may name the object; they still may not name
+ * the place, the owner, the process or a person, because a caption cannot
+ * carry a claim the register has not verified.
  *
  * ── Hard prohibitions ────────────────────────────────────────────────────
  * No generated image may depict: a named person; this company's actual land,
@@ -23,6 +33,10 @@
  * A cob whose rows could be counted is also forbidden — the eight-row fact is
  * asserted by code that counts, never by a model that guesses
  * (see docs/asset-plan.md, reconciliation of 2026-07-27).
+ *
+ * The prohibition is on GENERATED images and it stays exactly as written. A
+ * real photograph of the real variety may show a countable cob, because there
+ * the count is a fact rather than a guess.
  */
 
 /** `provvisorio` plates are annotated as such in the interface. */
@@ -61,17 +75,27 @@ export type MediaKey =
 
 export const media: Record<MediaKey, MediaAsset | null> = {
   /*
-   * ch01 — La varietà. CAMPITURA: soil as the ground the variety comes from.
-   * Real 2000×1250 derivative, not the 8:5 plate stretched — §8.4.
+   * ch01 — La varietà. CAMPITURA: the variety itself as the ground of the
+   * chapter that introduces it. Replaced the generated soil study on
+   * 2026-07-28 with the client's own photograph of the harvested cobs.
+   *
+   * A CAMPITURA is the ONE pattern where a full frame of red maize is legal
+   * without an Art Director decision: it renders at ≤0.08 opacity in
+   * `multiply`, so the 0–25° chroma the §9.5 grade preserves is crushed long
+   * before it can touch the `--chicco` budget of §4.4. Every other real
+   * photograph on file is either a saturated kernel frame or a labelled pack,
+   * and both need a decision this file cannot take — see
+   * docs/brand-alignment.md §4.
    */
   "varieta-campitura": {
-    src: "/images/generated/piastre/campo-terra-cover.avif",
+    src: "/images/foto/pannocchie-cover.avif",
     alt: "",
     caption: null,
     width: 2000,
     height: 1250,
-    status: "provvisorio",
-    source: "Higgsfield nano_banana_pro — material study, cover derivative",
+    status: "definitivo",
+    source:
+      "Fotografia del cliente (lettera di presentazione, 2026) — 538×593 originale, ritaglio 8:5, grade §9.5, upscale lanczos3 a 2000×1250",
   },
 
   /*
@@ -156,26 +180,38 @@ export const media: Record<MediaKey, MediaAsset | null> = {
   /*
    * ch07 — Le referenze. LASTRA opening the only product chapter on the site.
    *
-   * This is a COLLECTIVE composition and it is deliberately NON-ENUMERABLE:
-   * the pieces overlap and cannot be counted. That is the point. A composition
-   * in which three objects can be counted would restate "Non una gamma. Tre."
-   * — the false claim just removed from the copy. The catalogue holds five
-   * references, two of which are liquids that cannot be shown without
-   * inventing a bottle.
+   * THE SWAP art-review-immagini.md §0-bis C WAS WRITTEN FOR. That section
+   * shipped the generated crumb study as an explicitly provisional stand-in —
+   * "la fotografia collettiva definitiva delle confezioni la sostituirà nello
+   * stesso slot senza modifiche al layout" — and this is that photograph, from
+   * the client's own 2026 brochure. It is the only slot on the site where real
+   * packaging may appear, and the only one where §9.6's ban on packaging,
+   * labels and text inside a frame is lifted, because a register that never
+   * shows the jar is not a register of these products.
    *
-   * DECLARED LIMIT: this is not a packshot and does not stand in for one.
-   * Birra and Amaro do not appear. When the definitive collective photograph
-   * of the packaging exists it replaces this entry in place, and the layout
-   * does not move. See docs/art-review-immagini.md §0-bis C.
+   * Still non-enumerable, as §0-bis C requires: the packs overlap, run off
+   * three edges, and cannot be counted into a range.
+   *
+   * DECLARED LIMITS, both unchanged by the swap:
+   *   · Maisotti and La Maisèra do not appear — the composition predates one
+   *     and excludes the other.
+   *   · The kernel bed at the foot of the source is cropped away, but the
+   *     packaging's own terracotta band sits inside the 0–25° window the §9.5
+   *     grade holds at full saturation: 18,6% of the frame, ≈15% of a
+   *     1440×900 viewport against the 2% ceiling of §4.4. The mitigation §4.4
+   *     prescribes — the rail's active row reverts to `--inchiostro` in this
+   *     chapter — is a CSS change and therefore an Art Director call. It is
+   *     open. See docs/brand-alignment.md §4.
    */
   "referenze-collettiva": {
-    src: "/images/generated/piastre/referenze-collettiva.avif",
-    alt: "Farina, briciole e frammenti di sfoglia e grissini sparsi su carta.",
-    caption: "Materia.",
+    src: "/images/foto/referenze-confezioni.avif",
+    alt: "Confezioni di gallette di mais, monoporzioni e un vasetto di farina, sovrapposte.",
+    caption: "Le confezioni.",
     width: 1600,
     height: 1000,
-    status: "provvisorio",
-    source: "Higgsfield nano_banana_pro — collective material study, editorial plate",
+    status: "definitivo",
+    source:
+      "Fotografia del cliente (brochure 2026) — 908×908 originale, ritaglio 8:5, grade §9.5, upscale lanczos3 a 1600×1000",
   },
 };
 
