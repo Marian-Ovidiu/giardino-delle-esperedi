@@ -196,7 +196,15 @@ export function ExperienceMotion() {
           ScrollTrigger.create({
             trigger: custodyScene,
             start: "top top",
-            end: () => `+=${window.innerHeight}`,
+            /*
+             * The pin costs a full extra screen of scroll on every device
+             * (GSAP inserts a spacer of exactly `end - start`). On a phone
+             * that is 800px of page for one held moment, on top of a page
+             * already fighting its own length — so mobile holds for half a
+             * viewport. The inversion still fires on kernel 64 and the moment
+             * is still held; it is held for less scroll.
+             */
+            end: () => `+=${window.innerHeight * (window.innerWidth < 768 ? 0.5 : 1)}`,
             pin: true,
             pinSpacing: true,
             anticipatePin: 1,

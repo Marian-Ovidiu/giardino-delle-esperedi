@@ -479,9 +479,23 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
    * dynamic bar expands. It reserves the cover; it no longer positions it.
    */
   .hero {
+    /*
+     * 60svh, not 100svh. The cover held 800px around 134px of content — meta
+     * and title together — which is not a composition, it is a reservation.
+     * At 60svh the group sits at the top and roughly 240px of paper follows
+     * it: enough to read as a deliberate cover, not enough to cost a screen.
+     * §13 of the art direction fixes the grid and the ratios, never the hero
+     * height, so this is a mobile composition decision and not a violation.
+     */
+    min-height: 60svh;
     align-content: start;
     padding-top: var(--space-13);
     padding-bottom: var(--space-8);
+  }
+
+  /* Meta and title are one group: 24px binds them, 40px separated them. */
+  .hero__meta {
+    margin-bottom: var(--space-3);
   }
 
   .prologue-static--dispersion {
@@ -1370,13 +1384,19 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
 }
 
 @media (max-width: 767px) {
+  /* Viewport-scale min-heights are removed below 768px. On a phone they only
+     stretch a section past its content — `.scheda` alone forced 896px around
+     591px of content. Height is content-driven here. */
   .scheda {
-    min-height: 112svh;
+    min-height: auto;
   }
 
+  /* 64px, per art-direction §13.13: "Chapter padding drops from 168px to
+     64px". The implementation had 104px — not a composition decision but
+     80px of drift per chapter against the project's own law. */
   .chapter {
-    min-height: 120svh;
-    padding-block: var(--space-13);
+    min-height: auto;
+    padding-block: var(--space-8);
   }
 
   .chapter__title {
@@ -1430,12 +1450,12 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .chapter--royal__body {
-    margin-top: var(--space-13);
+    margin-top: var(--space-5);
   }
 
   .chapter--rows__proof {
-    min-height: var(--space-21);
-    margin-top: var(--space-8);
+    min-height: var(--space-13);
+    margin-top: var(--space-5);
   }
 
   .chapter--rows__proof b {
@@ -1453,34 +1473,42 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .chapter--conservation {
-    min-height: 152svh;
+    min-height: auto;
   }
 
+  /* --space-34 (272px) is a desktop value that was never overridden here, and
+     it produced the largest unexplained gap on the phone. The interval before
+     `2007` stays the widest on the page — deliberately — but at 64px. */
   .chapter--conservation__year {
-    margin-top: var(--space-21);
+    margin-top: var(--space-8);
   }
 
   .chapter--conservation__body {
-    margin-top: var(--space-34);
+    margin-top: var(--space-8);
   }
 
   .chapter--conservation__data {
-    margin-top: var(--space-13);
+    margin-top: var(--space-5);
   }
 
   .chapter--field__data {
     margin-top: var(--space-8);
   }
 
-  .chapter--field__body,
+  .chapter--field__body {
+    margin-top: var(--space-5);
+  }
+
+  /* The filiera line keeps a wider interval: it closes the chapter and reads
+     as a caption to everything above it. */
   .chapter--field__chain {
-    margin-top: var(--space-13);
+    margin-top: var(--space-8);
   }
 
   .chapter--stone__states {
     grid-template-columns: 1fr;
-    gap: var(--space-5);
-    margin-top: var(--space-8);
+    gap: var(--space-3);
+    margin-top: var(--space-5);
   }
 
   .chapter--stone__cut {
@@ -1489,11 +1517,11 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
 
   .chapter--stone__body,
   .chapter--stone__data {
-    margin-top: var(--space-13);
+    margin-top: var(--space-5);
   }
 
   .chapter--products {
-    min-height: 320svh;
+    min-height: auto;
   }
 
   .chapter--products__matrix {
@@ -1512,7 +1540,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
      leave a placeholder row mostly empty. */
   .product {
     grid-template-columns: 1fr;
-    padding-block: var(--space-5);
+    padding-block: var(--space-3);
   }
 
   .product__index,
@@ -1531,7 +1559,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .product__data {
-    margin-top: var(--space-3);
+    margin-top: var(--space-2);
   }
 
   .product__foot {
@@ -1541,13 +1569,31 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
     margin-top: var(--space-3);
   }
 
+  /* 240svh around 1.296px of content left 1.472px empty, 1.328px of it in
+     blocks over 120px with nothing to justify them. The scene keeps its own
+     100svh — that is the pinned frame the night inversion happens in, and it
+     is essential — but the section no longer reserves height on top of it. */
   .chapter--custody {
-    min-height: 240svh;
+    min-height: auto;
   }
 
   .chapter--custody__scene,
   .chapter--custody__body {
-    padding-block: var(--space-13);
+    padding-block: var(--space-8);
+  }
+
+  /*
+   * The scene held 800px around 160px of content — a label and three lines.
+   * 64svh still fills most of the phone and still reads as the moment the
+   * page stops, but stops reserving a full screen for it. The inversion, the
+   * palette and the pin are untouched; only the frame is shorter.
+   */
+  .chapter--custody__scene {
+    min-height: 64svh;
+  }
+
+  .chapter--custody__body {
+    min-height: auto;
   }
 
   .chapter--custody__label,
@@ -1559,20 +1605,23 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .chapter--custody__title {
-    margin-top: var(--space-13);
+    align-self: start;
+    margin-top: var(--space-8);
   }
 
   .chapter--custody__myth,
   .chapter--custody__close {
+    margin-top: var(--space-5);
+  }
+
+  /* The closing line keeps the widest interval of the chapter: it is the last
+     thing read before the footer and the pause is the composition. */
+  .chapter--custody__final {
     margin-top: var(--space-13);
   }
 
-  .chapter--custody__final {
-    margin-top: var(--space-21);
-  }
-
   .contact__inner {
-    padding-block: var(--space-13) var(--space-5);
+    padding-block: var(--space-8) var(--space-5);
   }
 
   /* Tablet and below: one column, source order. Every block keeps its own
@@ -1588,7 +1637,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .contact__inner {
-    row-gap: var(--space-8);
+    row-gap: var(--space-5);
   }
 }
 
@@ -1601,12 +1650,35 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .percorso + .percorso {
-    padding-top: var(--space-5);
+    padding-top: var(--space-3);
     border-top: 1px solid var(--rigo);
+  }
+
+  /* The footer carries six blocks; at 40px each the section-label rules alone
+     added 160px of air to a section that is already the longest on the page. */
+  .contact__section-label {
+    margin-bottom: var(--space-3);
+  }
+
+  .contact__percorso {
+    row-gap: var(--space-3);
+  }
+
+  .canale {
+    padding-block: var(--space-2);
   }
 
   .contact__legal {
     justify-content: flex-start;
+    padding-top: var(--space-3);
+  }
+
+  .percorso {
+    padding-top: var(--space-2);
+  }
+
+  .contact__social {
+    margin-top: var(--space-3);
   }
 }
 
@@ -1856,7 +1928,16 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
     width: 100%;
     grid-column: 1 / 8;
     grid-row: auto;
-    margin-top: var(--space-8);
+    margin-top: var(--space-5);
+  }
+
+  /* The 01–08 ruler is 25px of content that was carrying 64px above it. */
+  .chapter--products__matrix {
+    margin-top: var(--space-5);
+  }
+
+  .products {
+    margin-top: var(--space-5);
   }
 
   /* Three widths, not one. The full plates stay at 1–7; the two punctuation
