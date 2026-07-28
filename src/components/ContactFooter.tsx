@@ -81,10 +81,25 @@ export function ContactFooter() {
           </ul>
         </address>
 
+        {/*
+          A colophon, not a letterhead. The mark sits INSIDE the last line of
+          the document, at the size of a rubber stamp, beside the legal name.
+          Art Director ruling, docs/brand-signature-ruling.md §4.
+        */}
         <div className="contact__legal t-data">
+          <span className="contact__marchio marchio" aria-hidden="true" />
           <p>{piede.copyright}</p>
           <a href={piede.privacy.href}>{piede.privacy.label}</a>
         </div>
+
+        {/*
+          The terminal rule. Gold ABOVE the copyright would introduce a section
+          and become the letterhead that was rejected; gold below everything,
+          with nothing after it, closes. It must remain the last inked pixel on
+          the site — if anything is ever added beneath it, it moves or it dies,
+          because a gold divider is §4.4 illegal use #5.
+        */}
+        <span className="contact__fine" aria-hidden="true" />
       </div>
     </footer>
   );

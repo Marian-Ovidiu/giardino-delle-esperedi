@@ -317,6 +317,13 @@ export function CustodyChapter() {
         </h2>
       </div>
       <div className="chapter--custody__body field">
+        {/*
+          The company mark, facing the myth it is named after: the Esperidi
+          tree IS the orchard of Hera the paragraph beside it describes. It is
+          a citation, not a badge — hence --pietra, and hence no motion.
+          Art Director ruling, docs/brand-signature-ruling.md §3.
+        */}
+        <span className="chapter--custody__marchio marchio" aria-hidden="true" />
         <div className="chapter--custody__myth">
           {custodia.body.map((paragraph) => (
             <p className="t-d3 t-italic" key={paragraph}>

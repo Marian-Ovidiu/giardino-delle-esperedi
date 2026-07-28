@@ -219,3 +219,49 @@ The proposal is the best-argued document this project has produced and it is rig
 It fails in three places and all three are places where it reasoned instead of looking: the canopy does not fuse at 40px, T = 0.60 does not drop the superlative, and cream at 192px does not stay behind the myth. The header mark dies because it rebuilds the lockup its own §6 refuses, not because of the prologue. The seal's asset dies because thresholding is the wrong tool. The ch08 tree lives, in stone, and it is the placement that earns the whole thing.
 
 **Three marks, one ink, no motion. The kernel sequence keeps the frame.**
+
+---
+
+## Implementazione — 2026-07-28
+
+Delle tre istanze ratificate ne sono state costruite **due**. La terza è bloccata.
+
+| Istanza | Stato | Misurato |
+|---|---|---|
+| **ch08 · albero** | ✅ costruito | 192 desktop · 144 tablet · assente sotto 768 · `rgb(140,135,121)` = `--pietra` |
+| **footer · colofone** | ✅ costruito | 40 × 40 a ogni breakpoint · `--pietra` |
+| **footer · filetto terminale** | ✅ costruito | 1 px `rgb(217,164,65)` = `--esperide`, `1 / 8`, 0,5 px a ≥2dppx |
+| **ch07 · sigillo Mais Rosso** | ⛔ **bloccato** | l'asset è stato respinto as built; nessun file esiste |
+
+### La condizione vincolante è verificata, non asserita
+
+Il filetto terminale «deve restare l'ultimo pixel inchiostrato del sito». Misurato contando gli elementi con area non nulla il cui bordo superiore cade sotto quello del filetto:
+
+| | 1440 | 768 | 390 |
+|---|---|---|---|
+| Elementi sotto il filetto | **0** | **0** | **0** |
+
+Chi aggiunge qualcosa in fondo al documento rompe questa condizione e il filetto diventa un divisore oro — §4.4 uso illegale #5. Vale la pena tenerlo come test.
+
+### Tecnica: maschera, non file colorato
+
+Il marchio è disegnato mascherando il token attraverso l'alpha dell'artwork, non esportando un PNG già colorato:
+
+```css
+background-color: var(--pietra);
+mask-image: url("/images/marchio/tondo-384.png");
+```
+
+Due conseguenze volute. **Un valore sbagliato diventa strutturalmente impossibile** invece che soltanto documentato — non esiste un file `albero-oro.png` da collocare per errore. E **un solo file serve entrambi i campi**, giorno e notte, il che è la forma costruita della regola «un inchiostro per il marchio su tutto il sito».
+
+### Cosa serve per sbloccare ch07
+
+Nell'ordine, come da §6 di questo ruling:
+1. Brand Guardian — ricostruire il sigillo mascherando a mano entrambi i sotto-tondi dalla sorgente, poi ridurre. Render a 96/128/160.
+2. Art Director — verificare la massa delle pannocchie a 128 px. Se impasta, cadono le pannocchie; se fallisce anche quello, cade il sigillo e ch07 è portato dalla tipografia.
+
+**Il layout non cambia per accogliere un asset debole.**
+
+### Resta aperto e sopravanza tutto
+
+La croma fotografica di ch07 al ~15% contro un tetto del 2% (§4.4). Aperta prima di questo sprint, aperta dopo.

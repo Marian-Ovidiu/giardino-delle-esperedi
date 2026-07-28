@@ -1972,3 +1972,85 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
     --campitura-opacity: 0.08;
   }
 }
+
+/* ============================================================================
+   Marchio — the brand mark
+   Art Director ruling, docs/brand-signature-ruling.md. THREE instances site
+   wide were ratified; two ship here (ch08, footer). The third — the Mais Rosso
+   seal in ch07 — is blocked on an asset the AD rejected as built.
+
+   ONE INK, day and night: --pietra, always. The mark is drawn by masking the
+   token through the artwork's alpha, so a wrong value is structurally
+   impossible rather than merely documented, and one file serves both fields.
+   §4.3 already assigns --pietra to "rules, hairlines, non-text marks".
+
+   NOT --esperide: gold IS --indice on the night field, so a gold company mark
+   converts the index into a brand colour (§4.4 illegal use #5).
+   NOT --carta: at 15.37:1 it becomes the highest-contrast object in the frame
+   and the eye reaches it before the myth — the same failure, different token.
+   ========================================================================= */
+
+.marchio {
+  display: block;
+  background-color: var(--pietra);
+  -webkit-mask-image: url("/images/marchio/tondo-384.png");
+  mask-image: url("/images/marchio/tondo-384.png");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+/* ch08 — the citation. 192 fills 62% of the column pair and leaves its air;
+   256 would fill 83% and become an illustration plate. */
+.chapter--custody__marchio {
+  grid-column: 6 / 8;
+  grid-row: 1;
+  width: 192px;
+  height: 192px;
+}
+
+/* footer — the colophon, inside the last line, at stamp size. Below 40px the
+   roundel stops being a mark and becomes a smudge. */
+.contact__marchio {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  -webkit-mask-image: url("/images/marchio/tondo-80.png");
+  mask-image: url("/images/marchio/tondo-80.png");
+}
+
+/* The last inked pixel on the site. One of exactly two 1px --indice rules,
+   both in the footer; the other is .canale[data-primary]. A third is a defect. */
+.contact__fine {
+  grid-column: 1 / 8;
+  display: block;
+  height: 1px;
+  margin-top: var(--space-5);
+  background: var(--indice);
+}
+
+@media (min-resolution: 2dppx) {
+  .contact__fine {
+    height: 0.5px;
+  }
+}
+
+@media (max-width: 1279px) {
+  .chapter--custody__marchio {
+    width: 144px;
+    height: 144px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* §8.5's rule, applied to marks: below 768 the register collapses to one
+     column and the site is typographic. The colophon survives because it costs
+     no rhythm — it sits inside a line that already exists. */
+  .chapter--custody__marchio {
+    display: none;
+  }
+}
