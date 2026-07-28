@@ -462,7 +462,24 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
     grid-column: 6 / 8;
   }
 
+  /*
+   * The cover starts at the top, not at the foot of the screen.
+   *
+   * The base rule pins the hero with `align-content: end` on a 100svh box.
+   * On desktop that is the composition — the headline sits low and the field
+   * breathes above it. On a phone it produced ~518px of dead space between
+   * the header and the first line, with the title ending 64px above the fold.
+   *
+   * `start` puts the residual space BELOW the content, where it belongs.
+   * padding-top 104px against a header that ends at 64px leaves 40px of air —
+   * inside the 32–56px band and on the spacing scale.
+   *
+   * `100svh` is kept deliberately: svh is the SMALL viewport height, measured
+   * with the browser bars shown, so the first screen is never cut when the
+   * dynamic bar expands. It reserves the cover; it no longer positions it.
+   */
   .hero {
+    align-content: start;
     padding-top: var(--space-13);
     padding-bottom: var(--space-8);
   }
