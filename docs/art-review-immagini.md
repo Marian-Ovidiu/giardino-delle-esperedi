@@ -180,7 +180,7 @@ E c'è un secondo problema, più grave, che la richiesta non nominava:
 
 **2. Criticità.** Nessuna.
 
-**3. Nuovo layout proposto.** **Invariato. Zero fotografia, per legge.**
+**3. Nuovo layout proposto.** **Zero fotografia, per legge.** Un solo segno non fotografico, ratificato il 2026-07-28 — vedi l'emendamento qui sotto.
 
 **4. Motivazione.** L'inversione notturna è l'unico evento cromatico del sito (Invariante 3). Introdurre fotografia sul campo `--notte` costringerebbe a un secondo trattamento d'immagine — su fondo scuro il `multiply` non funziona — e diluirebbe il momento che l'intera pagina costruisce per otto capitoli. **La chiusura è tipografica e deve restarlo.** Che gli ultimi 3.000 px non abbiano fotografia è corretto; il problema sono i 4.500 px *prima*, che il punto 7 risolve.
 
@@ -188,9 +188,38 @@ E c'è un secondo problema, più grave, che la richiesta non nominava:
 
 ---
 
+### 8-bis. Emendamento — 2026-07-28 · il marchio Esperidi in `ch08`
+
+Questa sezione diceva **"invariato"**. Il divieto reale era, ed è, **zero fotografia**, e la motivazione al punto 4 è interamente fotografica: il `multiply` non funziona su fondo scuro, servirebbe un secondo trattamento, la chiusura deve restare tipografica. **Nessuno di questi argomenti si applica a una maschera alpha a un solo inchiostro.** Non richiede la gradazione §9.5, non richiede blend mode, non richiede un secondo trattamento: è disegno al tratto dipinto con un token esistente, più vicino ai quattro segni di registro che a una fotografia.
+
+Ratificato — `docs/brand-signature-ruling.md` §3:
+
+| | |
+|---|---|
+| **Che cosa** | il tondo dell'albero Esperidi, solo tondo, mai il logotipo del file |
+| **Dove** | `.chapter--custody__body`, `grid-column: 6 / 8; grid-row: 1; justify-self: end; align-self: start` |
+| **Quanto** | **192 × 192** desktop · 144 × 144 tablet · **assente sotto 768** |
+| **Valore** | **`--pietra`** (5,48:1 su `--notte`) — **non** `--carta`, **non** `--esperide` |
+| **Movimento** | nessuno |
+| **Semantica** | `aria-hidden="true"` |
+
+**Perché `--pietra` e non gli altri due.** Reso e confrontato dal vero a 192px sui tre valori candidati (`docs/captures/ad-ch08-tree/`):
+
+- **`--esperide` è rifiutato** perché sul campo notte l'oro **è** `--indice`. Un marchio dorato è grammaticalmente un segno d'indice puntato sull'azienda, e converte l'indice in colore di marca (§4.4, uso illegale #5). Vale prima e indipendentemente dall'argomento del "grida più forte del mito".
+- **`--carta` è rifiutato** perché a 15,37:1 e 192px è l'oggetto compatto a più alto contrasto dell'inquadratura: l'occhio arriva all'albero prima che al mito. Rende il logo protagonista del capitolo che è la risoluzione emotiva del sito — lo stesso difetto giustamente rifiutato per l'oro, ottenuto con un altro token.
+- **`--pietra` è ratificato.** La gerarchia esce nell'ordine giusto: **mito in oro (l'evento) > corpo in crema (il testo) > marchio in pietra (la citazione).** L'albero resta pienamente leggibile come una xilografia a margine.
+
+**Il capitolo resta senza fotografia.** L'alternanza di §9 non cambia: `ch08` continua a contare **nulla**. Un segno a un inchiostro non è uno dei tre pattern fotografici e non ne apre un quarto.
+
+**Sotto 768: assente.** `.chapter--custody__body` è `min-height: auto` su mobile e non ha margine residuo; l'audit del ritmo verticale mobile lo ha eliminato deliberatamente. Vale la regola già applicata ai `REPERTO` (§8.5): **i segni grafici vivono dove vive il registro a due colonne; sotto 768 il sito è tipografico.**
+
+---
+
 ## 9. I tre pattern fotografici della landing
 
 Tre, e non uno di più. Ogni immagine della pagina deve appartenere a uno di questi.
+
+**Precisazione — 2026-07-28.** I **marchi** di §11.3 (il tondo Esperidi, il sigillo Mais Rosso Co.) non sono immagini e non appartengono a questi pattern: sono maschere alpha a un solo inchiostro, dipinte con `--pietra`, senza gradazione §9.5 e senza blend mode. Non aprono un quarto pattern, non entrano nell'alternanza, e il loro numero è chiuso altrove — **tre istanze in tutto il sito**. Un marchio che acquisisse una gradazione, un fondo, un colore o una seconda istanza smetterebbe di essere un marchio e ricadrebbe sotto questa sezione.
 
 ### A · `LASTRA` — la lastra a vivo
 8:5, 1.100–1.250 px renderizzati, esce dal bordo destro per il 14–18%. **Massimo tre in tutta la pagina: `ch02`, `ch05`, `ch07`** — i soli capitoli in cui §7.4.1 lo consente. È il momento fotografico alto, e la sua rarità è il suo valore.

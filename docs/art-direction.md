@@ -807,17 +807,64 @@ Karl Blossfeldt's botanical plates. Seed-bank record cards. Kew herbarium sheets
 |---|---|---|---|
 | 1px | `--rigo` (`--pietra` / `rgba(carta,.24)`) | Structural dividers, registry row separators, the rail's right edge, column separators | unlimited |
 | 1px | `--rigo-forte` (`--inchiostro` / `--carta`) | Emphatic division — the top of a chapter, the head of the registry column | **max 2 per chapter** |
+| 1px | `--indice` (`--chicco` / `--esperide`) | Index and terminal marks | **max 2 on the entire site, both in the footer** — see below |
 | 2px | `--indice` (`--chicco` / `--esperide`) | Index marks | **chapters 03 and 05 only**, subject to §4.4 |
 
 - Hairlines are true **1px at 1dppx and 0.5px at ≥ 2dppx**, via `@media (min-resolution: 2dppx)`. Never `border-width: thin`. Never scaled with the layout.
-- **Rule lengths are always a multiple of 8, or exactly one full column/field span.** A 137px rule is a defect.
+- **Rule lengths are always a multiple of 8, one full column span, or the full inked field span (columns 1–8 exclusive of the reserved void).** A 137px rule is a defect.
 - Rules are always horizontal or vertical. **No diagonals anywhere on the site.**
+
+**The 1px `--indice` row — added 2026-07-28 (`docs/brand-signature-ruling.md` §4).** Four weights would be a defect; this is not a fourth weight, it is a colour/weight pairing the table previously failed to enumerate while one instance already shipped. It authorises **exactly two rules on the entire site, both inside the footer**, and no more:
+
+1. **The primary-channel rule** — `.canale[data-primary]`, columns 2–5. Already built (`components.css:1222`); documented here rather than grandfathered.
+2. **The terminal rule** — `grid-column: 1 / 8`, placed **below** `.contact__legal`, closing the document.
+
+Conditions on the terminal rule, each independently a defect if broken:
+
+- **It must be the last inked pixel in the document.** A gold rule with nothing after it is terminal; a gold rule with content after it is a divider, and a gold divider is §4.4 illegal use #5. If anything is ever added below it, the rule moves or dies.
+- It runs from the rail's edge to the reserved void, **wider than everything above it**, so it reads as the edge of the sheet rather than a division between two blocks. A gold rule *above* `.contact__legal` is a letterhead and is refused.
+- On the day field this row can never fire: §4.5 puts the footer permanently in night, so `--indice` here is always `--esperide` and never `--chicco`.
+- **A third 1px `--indice` rule anywhere makes gold a divider colour and costs both existing rules their meaning.** There is no third.
 
 ### 11.3 Marks
 
 - **The kernel** — a 4 × 4px square (3 × 3 tablet, 2 × 2 mobile). The site's only repeated mark. It appears in the rail and nowhere else.
 - **The registration mark** — a 16 × 16px cross of 1px `--esperide` strokes with a 4px centre gap. It appears **exactly four times on the entire site**, at the four corners of the chapter-08 field, and nowhere else. It is a printer's mark and it earns its place by being rare.
+- **The brand marks** — two, in three placements, added 2026-07-28. Enumerated below.
 - No other marks, bullets, dingbats, dividers, ornaments or glyph decorations exist. List items use a 1px `--rigo` rule, not a bullet.
+
+#### Brand marks — added 2026-07-28 (`docs/brand-signature-ruling.md`)
+
+Two marks exist and there is no third. **Three instances on the entire site**, and there is no fourth.
+
+| Mark | Where | Size (desktop / tablet / mobile) | Value |
+|---|---|---|---|
+| **Esperidi tree roundel** | ch08 `__body`, cols 6/8 row 1, `justify-self: end; align-self: start` | 192 / 144 / absent | `--pietra` |
+| **Esperidi tree roundel** | footer, first flex child of `.contact__legal`, `align-self: center` | 40 / 40 / 40 | `--pietra` |
+| **Mais Rosso Co. seal** | ch07 head, cols 6/8 row 1, `justify-self: end; align-self: end` | 128 / 96 / absent | `--pietra` |
+
+**One ink.** `--pietra` on the day field and on the night field, without exception. §4.3 assigns this token to non-text marks; it is 2.80:1 on `--carta` and 5.48:1 on `--notte`. Both marks ship as **alpha masks** painted with `background-color`, wrapped in `@supports (mask-image: url()) or (-webkit-mask-image: url())` so a failure yields nothing rather than a solid square. No mark ever ships as a colour image. There is no `--marchio` alias: one token, never varying, nothing to alias.
+
+**The governing rule, from which every limit below follows:**
+
+> A mark never asserts anything the type has not already said. It is always placed **facing** a sentence that names the company — across a page, or closing a document. Adjacency at one gutter is not citation, it is a lockup.
+
+**Each of these is independently a defect:**
+
+1. **A brand mark on the same line as the wordmark**, at any placement, at any size. This is what killed the proposed header mark: a roundel one gutter from `IL GIARDINO DELLE ESPERIDI` is a favicon-plus-site-title lockup, it fails §19.16, and it is the most conventional gesture in web design.
+2. **A brand mark anywhere in chapter 01.** §7.6 is a fixed composition with six enumerated contents. A seventh is an amendment to §7.6, which this clause does not grant.
+3. **A brand mark in `--chicco`, `--esperide` or `--carta`.** A mark says *who*; an index says *which one*. Gold on the night field **is** `--indice`, so a gold mark converts the index into a brand colour (§4.4 #5). `--carta` at 15.37:1 makes the mark the loudest object in the night field and inverts the ch08 hierarchy — verified on render, `docs/captures/ad-ch08-tree/`.
+4. **A brand mark below 40px.** Below 40 the roundel stops resolving as a tree in a circle and becomes a smudge on the paper texture. An unreadable mark is not discretion; it costs the same pixels and reads as a substrate defect.
+5. **The full lockup — roundel plus the wordmark from the logo file — anywhere.** Only the roundel ships. The company name is live Archivo at every placement.
+6. **Any motion on any mark**: entry fade, stroke draw-on, scroll-linked opacity or scale, rotation, hover, or a beat inside the §12.6 inversion. §18.2, §18.32, §12.7.
+7. **A mark inside the rail** (the kernel is the rail's only mark), **in column 8**, or **overlaid on a photograph** (a mark on a documentary photograph makes the photograph an advertisement).
+8. **A mark repeated per row, per product or per section.** Repetition converts a citation into a device.
+9. **A payoff, tagline or descriptor beside any mark.** A mark that needs a sentence to explain it is not working.
+10. **Any marketing superlative reproduced inside a mark**, legible or ghosted — see §18.29.
+
+Marks are `aria-hidden="true"` without exception; the accessible name is always the adjacent text. Because they are wholly redundant with that text and non-interactive, WCAG 1.4.11 does not apply, which is why `--pietra` at 2.80:1 is legal for them and for nothing else.
+
+**Below 768px, only the footer mark survives.** This is the rule §8.5 already applies to `REPERTO`: *graphic marks live where the two-column register lives; below 768 the site is typographic.* It is a rule, not an omission.
 
 ### 11.4 Icons
 
@@ -1070,7 +1117,7 @@ Enumerated, project-specific, non-negotiable. Each entry is independently a reje
 3. **`border-radius` ≠ 0**, anywhere, including images, inputs, video and the cookie notice.
 4. **`box-shadow` with blur > 0**, anywhere. `filter: drop-shadow()`, anywhere.
 5. **Gradients** — `linear-gradient`, `radial-gradient`, `conic-gradient` — **except** the two `repeating-linear-gradient` declarations drawing the chain lines (§10.2).
-6. **Icons.** Zero SVG icons, zero icon fonts, zero emoji, zero glyph substitutes.
+6. **Icons.** Zero SVG icons, zero icon fonts, zero emoji, zero glyph substitutes. **One carve-out, added 2026-07-28:** the two brand marks of §11.3, in their three enumerated placements. A company mark is not an icon — it names a maker, it is not a member of a set, and it does not stand for an action. To keep the carve-out from widening, the marks may never acquire a hover state, a link target, a tooltip, a `title`, a second member, a repeated instance, or a companion mark of any kind. **The moment a second graphic device appears alongside them, they have become an icon system and this entry applies again in full.**
 7. **Buttons with a background fill.** Any filled, bordered-box or pill-shaped control.
 8. **Cards.** Any element whose `background-color` differs from its parent's, except the rail hover panel and the chapter-08 field.
 9. **`--chicco` as a fill, background, gradient stop, tint, partial opacity, state colour, or above 2% viewport coverage.** *(Invariant 2.)*
@@ -1093,7 +1140,7 @@ Enumerated, project-specific, non-negotiable. Each entry is independently a reje
 26. **Hero buttons, scroll hints, "scopri di più", chevrons, mouse-wheel graphics, animated down-arrows.**
 27. **Purple, indigo, teal, or any colour outside the seven declared hexes** and their `rgba()` derivations.
 28. **`Inter`, `Geist`, or any system sans as a visible face.**
-29. **Marketing adjectives set in display type.** *Eccellenza, passione, autentico, genuino, unico* in Bodoni at any size. If one appears at `--type-d3` or above, I reject the build outright.
+29. **Marketing adjectives set in display type.** *Eccellenza, passione, autentico, genuino, unico* in Bodoni at any size. If one appears at `--type-d3` or above, I reject the build outright. **Extended 2026-07-28: a graphic is not exempt from this rule because it is a graphic.** A superlative reproduced as a page device — drawn, lettered, thresholded or ghosted — is the site asserting it, and is refused on the same terms as type. Inside a documentary *photograph* of real packaging it is reportage and it stays; redrawn as a page mark it does not. This is why `GOURMET PREMIUM` is removed from the ch07 seal by hand mask before reduction, and not left to a luminance threshold that demonstrably fails to drop it (`docs/brand-signature-ruling.md` §2.2).
 30. **Loading spinners, skeleton shimmer, progress bars, percentage counters.**
 31. **A cookie notice, privacy page or 404 styled outside this document.** They are part of the site, not exempt from it.
 32. **Decorative animation with no narrative job.** If you cannot state the sentence an animation is speaking, it is decoration and it is cut.
