@@ -686,50 +686,31 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   grid-row: 1;
 }
 
-.chapter--rows__proof {
-  grid-column: 2 / 8;
-  grid-row: 2;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  min-height: var(--space-34);
-  margin-top: var(--space-13);
-  border-block: 1px solid var(--rigo);
-}
+/* Row 2, not 3. The eight-cell ruler held row 2 until 2026-07-29; with it gone
+   the row collapses to nothing but its margins survive, so the head was left
+   floating 168px above the body. These are re-based on the head, not on an
+   element that no longer exists.
 
-.chapter--rows__proof span {
-  position: relative;
-  border-left: 1px solid var(--rigo);
-}
-
-.chapter--rows__proof span:last-child {
-  border-right: 1px solid var(--rigo);
-}
-
-.chapter--rows__proof b {
-  position: absolute;
-  bottom: var(--space-2);
-  left: var(--space-1);
-  color: var(--testo-2);
-  font-weight: 400;
-}
-
+   NO margin-top, at any width. The 8 is a display glyph with its own optical
+   space above the numeral, so a margin on top of it double-counts leading the
+   type already carries. .chapter--rows__body keeps its own margin and sets the
+   row height; the 8 simply starts where the row starts. */
 .chapter--rows__eight {
   grid-column: 1 / 4;
-  grid-row: 3;
-  margin-top: var(--space-8);
+  grid-row: 2;
   color: var(--rigo);
 }
 
 .chapter--rows__body {
   grid-column: 3 / 6;
-  grid-row: 3;
-  margin-top: var(--space-13);
+  grid-row: 2;
+  margin-top: var(--space-8);
 }
 
 .chapter--rows__data {
   grid-column: 6 / 8;
-  grid-row: 3;
-  margin-top: var(--space-21);
+  grid-row: 2;
+  margin-top: var(--space-13);
 }
 
 /* 04 — loss expressed as duration and void */
@@ -1433,7 +1414,6 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   .chapter--royal__body,
   .chapter--royal__data,
   .chapter--rows__head,
-  .chapter--rows__proof,
   .chapter--rows__eight,
   .chapter--rows__body,
   .chapter--rows__data,
@@ -1463,20 +1443,6 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   }
 
   .chapter--royal__body {
-    margin-top: var(--space-5);
-  }
-
-  .chapter--rows__proof {
-    min-height: var(--space-13);
-    margin-top: var(--space-5);
-  }
-
-  .chapter--rows__proof b {
-    left: 2px;
-    font-size: 8px;
-  }
-
-  .chapter--rows__eight {
     margin-top: var(--space-5);
   }
 
@@ -1755,23 +1721,6 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   padding-top: var(--space-1);
   border-top: 1px solid var(--rigo);
   color: var(--testo-2);
-}
-
-/* Says out loud that the plate is a stand-in. Disappears by itself when the
-   asset's status becomes `definitivo`. */
-.piastra__nota {
-  margin-left: auto;
-  color: var(--testo-2);
-}
-
-.piastra__nota::before {
-  content: "";
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  margin-right: var(--space-1);
-  vertical-align: 0.2em;
-  border: 1px solid var(--rigo);
 }
 
 /* — A · LASTRA ————————————————————————————————————————————————

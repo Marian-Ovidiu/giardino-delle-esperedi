@@ -4,7 +4,8 @@
 **Date:** 2026-07-28
 **Binds:** `src/lib/prologue/shaders.ts`, `src/lib/prologue/topology.ts`, `src/lib/prologue/renderer.ts`
 **Amends:** `docs/motion-spec.md` §6.2 (one prohibition, narrowly — see §5)
-**Evidence:** `docs/captures/ad-rifinitura/` — 15 checkpoints × 2 modes (`shipped`, `nudo`) + 6 macro crops at 4× DPR
+**Evidence:** `docs/captures/ad-rifinitura/` — 15 checkpoints × 2 modes (`shipped`, `nudo`) + 6 macro crops at 4× DPR.
+Only the six macro crops remain in the tree; the full set was archived on 2026-07-29 — see `docs/captures/LEGGIMI.md`.
 
 ---
 
@@ -175,7 +176,7 @@ See `nudo/p70.png`. There are 48 plants and they render. The client says "vuoto"
 
 **6. I refuse a fifth stage and any new time base.** Everything ordered here fits the six stages and stays a pure function of `scrollY`.
 
-**7. I refuse to accept the first capture pass as evidence.** `docs/captures/prologo-stadi/cob-pannocchia.png`, filed as the magnified cob, **contains no cob** — it is a crop of the wordmark. Two images cannot review a six-stage sequence. Superseded by `docs/captures/ad-rifinitura/`.
+**7. I refuse to accept the first capture pass as evidence.** `docs/captures/prologo-stadi/panoramica.png`, filed as the magnified cob, **contains no cob** — it is a crop of the wordmark. Two images cannot review a six-stage sequence. Superseded by `docs/captures/ad-rifinitura/`.
 
 ---
 

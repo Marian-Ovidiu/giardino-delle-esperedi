@@ -132,7 +132,7 @@ export const chapters: readonly Chapter[] = [
       { label: "Coltivato in", value: "Piemonte" },
       { label: "Fino a", value: "metà del secolo scorso" },
     ],
-    caption: "Brattee secche.",
+    caption: "Pannocchia.",
     railFact: "tradizione aziendale: il mais del Re",
   },
   {

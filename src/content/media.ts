@@ -16,8 +16,15 @@
  * `/images/generated/piastre/…` — narrative, not documentary. Material studies
  * that set a register and a rhythm. They are NOT records of this company's
  * fields, harvests, equipment or people, and nothing in the alt text or
- * captions may suggest they are. They carry `status: "provvisorio"` and the
- * interface annotates them.
+ * captions may suggest they are.
+ *
+ * They carry `status: "provvisorio"`, which is now BOOKKEEPING ONLY. Until
+ * 2026-07-29 the interface printed "Immagine provvisoria" beside every one of
+ * them; the client removed it. The status still drives `data-status` on the
+ * figure and still marks what has to be replaced, but nothing on the page says
+ * so any more — so the alt text and the caption are the ONLY thing left
+ * stopping a generated plate from being read as evidence. They carry the whole
+ * weight now, and the rule above them is no longer a formality.
  *
  * `/images/foto/…` — the client's OWN photographs, from the 2026 brochure and
  * presentation letter, cropped and graded by scripts/build-brand.mjs. These
@@ -123,8 +130,12 @@ export const media: Record<MediaKey, MediaAsset | null> = {
      * max-age=14400 on /_next/image). Next iteration gets a new name.
      */
     src: "/images/generated/piastre/re-materia-test.png",
-    alt: "Brattee secche di mais su fondo chiaro, in luce radente.",
-    caption: "Brattee secche.",
+    // Rewritten 2026-07-29 with the trial image: it is a whole cob with the
+    // husk opened, not the dry bracts the previous plate showed. A caption
+    // that describes a different picture is the one thing a register may not
+    // print.
+    alt: "Pannocchia di mais rosso con le brattee aperte, su fondo chiaro, in luce radente.",
+    caption: "Pannocchia.",
     width: 1600,
     height: 1000,
     status: "provvisorio",
@@ -144,8 +155,8 @@ export const media: Record<MediaKey, MediaAsset | null> = {
      * reperto ratio above 768px and that is not a media-registry decision.
      */
     src: "/images/generated/piastre/atmosfera-luce.png",
-    alt: "Polvere sospesa in una lama di luce radente.",
-    caption: "Luce.",
+    alt: "Pianta di mais con una pannocchia rossa fra le brattee, su fondo chiaro.",
+    caption: "Pianta.",
     width: 1200,
     height: 1200,
     status: "provvisorio",
@@ -176,8 +187,8 @@ export const media: Record<MediaKey, MediaAsset | null> = {
      * unless you look at a phone width.
      */
     src: "/images/generated/piastre/atmosfera-luce.png",
-    alt: "Polvere sospesa in una lama di luce radente.",
-    caption: "Luce.",
+    alt: "Pianta di mais con una pannocchia rossa fra le brattee, su fondo chiaro.",
+    caption: "Pianta.",
     width: 1600,
     height: 1000,
     status: "provvisorio",
@@ -258,6 +269,3 @@ export const media: Record<MediaKey, MediaAsset | null> = {
       "Fotografia del cliente (brochure 2026) — 908×908 originale, ritaglio 8:5, grade §9.5, upscale lanczos3 a 1600×1000",
   },
 };
-
-/** Annotation shown on any plate that is not yet the definitive photograph. */
-export const provisionalNote = "Immagine provvisoria";

@@ -169,13 +169,16 @@ test.describe("OTTO full experience", () => {
       await expect(plates.nth(index)).toHaveAttribute("aria-hidden", "true");
     }
     await expect(page.locator("[data-kernel-prologue]")).toHaveCSS("position", "fixed");
-    const releaseClearsProof = await page.evaluate(() => {
+    // Was measured against .chapter--rows__proof, the eight-cell ruler removed
+    // on 2026-07-29. The oversized 8 is now the first thing in the chapter the
+    // release plate must not land on top of.
+    const releaseClearsChapter = await page.evaluate(() => {
       const release = document.querySelector<HTMLElement>(".prologue-static--release");
-      const proof = document.querySelector<HTMLElement>(".chapter--rows__proof");
-      if (!release || !proof) return false;
-      return release.getBoundingClientRect().bottom <= proof.getBoundingClientRect().top;
+      const eight = document.querySelector<HTMLElement>(".chapter--rows__eight");
+      if (!release || !eight) return false;
+      return release.getBoundingClientRect().bottom <= eight.getBoundingClientRect().top;
     });
-    expect(releaseClearsProof).toBe(true);
+    expect(releaseClearsChapter).toBe(true);
   });
 
   test("keeps the complete fallback in server HTML without JavaScript", async ({
@@ -945,16 +948,27 @@ test.describe("OTTO full experience", () => {
     expect(broken).toEqual([]);
   });
 
-  test("labels provisional plates and claims nothing through them", async ({ page }) => {
+  test("claims nothing through a plate, provisional or not", async ({ page }) => {
     const provisional = page.locator('.piastra[data-status="provvisorio"]');
-    const count = await provisional.count();
-    expect(count).toBeGreaterThan(0);
+    expect(await provisional.count()).toBeGreaterThan(0);
 
-    // A stand-in shown without saying so is a claim the register has not
-    // earned. The annotation disappears on its own once status is definitivo.
-    for (let i = 0; i < count; i += 1) {
-      await expect(provisional.nth(i).locator(".piastra__nota")).toHaveCount(1);
-    }
+    /*
+     * This test used to require a visible "Immagine provvisoria" annotation on
+     * every provisional plate. The client removed that annotation on
+     * 2026-07-29. `data-status` survives, so the registry still knows which
+     * plates are stand-ins — but nothing on the page says so, which means the
+     * alt text and the caption are now the ONLY thing keeping a generated
+     * picture from being read as evidence. The checks below stop being a
+     * formality at that point, so they are the whole test now.
+     */
+    const empty = await page
+      .locator(".piastra:not(.piastra--campitura)")
+      .evaluateAll((figures) =>
+        figures
+          .filter((f) => !(f.querySelector("figcaption")?.textContent ?? "").trim())
+          .map((f) => f.querySelector("img")?.getAttribute("src") ?? "?"),
+      );
+    expect(empty, "a citable plate must carry a caption").toEqual([]);
 
     // Alt text and captions describe what is visible — never a place, an
     // owner, a person or a process. These images are narrative, not

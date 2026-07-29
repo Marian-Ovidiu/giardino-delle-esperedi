@@ -61,13 +61,11 @@ export function EightRowsChapter() {
       <div className="chapter--rows__head">
         <ChapterHead index={2} />
       </div>
-      <div className="chapter--rows__proof" aria-label="Otto file">
-        {Array.from({ length: 8 }, (_, index) => (
-          <span key={index}>
-            <b className="t-data">{String(index + 1).padStart(2, "0")}</b>
-          </span>
-        ))}
-      </div>
+      {/* The eight-column ruler that stood here — eight cells numbered 01–08,
+          aria-label "Otto file" — was removed on 2026-07-29 at the client's
+          request. The chapter still argues the number: the body says it, the
+          rail counts it, and the signature prologue resolves eight kernel rows
+          into eight incisions. The oversized 8 below stays. */}
       <p className="chapter--rows__eight t-d0" aria-hidden="true">
         8
       </p>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { media, provisionalNote, type MediaKey } from "@/content/media";
+import { media, type MediaKey } from "@/content/media";
 
 /**
  * A plate in the register.
@@ -20,7 +20,7 @@ import { media, provisionalNote, type MediaKey } from "@/content/media";
  *
  * `campitura` The image as the ground of a whole section, behind everything.
  *             Decorative and `aria-hidden`: a ground is not a citable plate,
- *             so it carries no caption and no provisional annotation.
+ *             so it carries no caption.
  *
  * Every variant renders a file authored at the ratio it is displayed at.
  * There is no CSS re-cropping: §8.4 makes `object-fit: cover` on a box of a
@@ -86,13 +86,14 @@ export function Piastra({
         />
       </div>
 
-      {(asset.caption || asset.status === "provvisorio") && (
-        <figcaption className="piastra__caption t-small">
-          {asset.caption}
-          {asset.status === "provvisorio" && (
-            <span className="piastra__nota t-label">{provisionalNote}</span>
-          )}
-        </figcaption>
+      {/* The "Immagine provvisoria" annotation was printed here until
+          2026-07-29 and was removed at the client's request. `data-status`
+          survives on the figure, so a provisional plate is still findable in
+          the DOM and in the registry — it just no longer says so on the page.
+          The caption below is now the only thing describing the picture, which
+          is why it must describe THIS picture and not the one it replaced. */}
+      {asset.caption && (
+        <figcaption className="piastra__caption t-small">{asset.caption}</figcaption>
       )}
     </figure>
   );
