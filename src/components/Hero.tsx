@@ -7,16 +7,15 @@ export function Hero() {
       <StaticProloguePlate state="dispersion" />
       <p className="hero__meta t-data">{hero.meta}</p>
       <div className="hero__display" data-motion="hero-title">
+        {/* One .hero__title-line per line: the outer span is the clipping
+            window the GSAP reveal wipes through, the inner one is what moves.
+            Three of them now, not two — see the note on hero.lines. */}
         <h1 id="titolo-principale" className="t-d0">
-          <span className="hero__title-line">
-            <span>Mais Rosso</span>
-          </span>
-          <span className="hero__title-line hero__title-line--wide">
-            <span>
-              <span className="hero__title-word">Ottofile</span>{" "}
-              <em className="hero__title-word hero__title-word--clipped">{hero.clippedWord}</em>
+          {hero.lines.map((line) => (
+            <span className="hero__title-line" key={line}>
+              <span>{line}</span>
             </span>
-          </span>
+          ))}
         </h1>
       </div>
     </section>

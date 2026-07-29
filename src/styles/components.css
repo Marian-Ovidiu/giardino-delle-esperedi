@@ -297,24 +297,6 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   display: block;
 }
 
-.hero__title-line em {
-  font-style: normal;
-}
-
-/* The clipping WINDOW, not the text. It must never exceed the field, or the
-   document itself becomes horizontally scrollable — which is what was
-   happening at 390px (scrollWidth 409 vs clientWidth 390). The child below
-   carries `max-content` and is clipped by this box: that is what "clipped by
-   the right edge" means, and it is the only correct way to express it. */
-.hero__title-line--wide {
-  width: 100%;
-}
-
-.hero__title-line--wide > span {
-  width: max-content;
-  white-space: nowrap;
-}
-
 .scheda {
   padding-top: var(--space-21);
   padding-bottom: var(--space-21);
@@ -480,14 +462,20 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
    */
   .hero {
     /*
-     * 60svh, not 100svh. The cover held 800px around 134px of content — meta
-     * and title together — which is not a composition, it is a reservation.
-     * At 60svh the group sits at the top and roughly 240px of paper follows
-     * it: enough to read as a deliberate cover, not enough to cost a screen.
-     * §13 of the art direction fixes the grid and the ratios, never the hero
-     * height, so this is a mobile composition decision and not a violation.
+     * 44svh, not 100svh and no longer 60svh. The cover once held 800px around
+     * 134px of content, which is not a composition but a reservation; 60svh
+     * fixed that and left roughly 240px of paper trailing the title.
+     *
+     * The title is three lines from 2026-07-29 and 31px taller, and the client
+     * still read the trailing paper as dead. 44svh puts ~104px under the
+     * title — the same --space-13 the desktop cover leaves — so the gap from
+     * the title to the first chapter text resolves to 168px, which is
+     * --space-21 exactly rather than an arbitrary sum.
+     *
+     * §13 fixes the grid and the ratios, never the hero height, so this stays
+     * a mobile composition decision and not a violation.
      */
-    min-height: 60svh;
+    min-height: 44svh;
     align-content: start;
     padding-top: var(--space-13);
     padding-bottom: var(--space-8);
@@ -517,11 +505,6 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
 
   .hero__display {
     grid-column: 1 / 8;
-  }
-
-  .hero__title-line--wide {
-    width: max-content;
-    white-space: nowrap;
   }
 
   .scheda {
@@ -569,41 +552,62 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   }
 }
 
-/* — registro (the data table) —————————————————————————————— */
+/* — registro — the determination stack ————————————————————————————
+   Art Director ruling 2026-07-29, docs/registro-dati-ruling.md.
+
+   ONE axis. The value leads and owns the full column; the label captions it
+   from below. There is no value column: a value column is a price column, and
+   it is the single thing that made this block read as a product spec sheet.
+
+   The second axis it replaces existed to let a reader compare row n with row
+   n+1. Nobody compares "Mais" with "8". It did no work and cost the values two
+   thirds of their width.
+
+   Scan the left edge and you now read the record — Mais · Ottofile · Albese ·
+   il mais del Re · Cherasco (CN), Piemonte — rather than the form it was typed
+   into. §10.5 has named Kew sheets and museum cartellini since Phase 3, and
+   every one of them puts the thing first and the category underneath.
+
+   Order is inverted with grid-row, not in the markup: the <dl> stays a term
+   followed by its definition, so screen readers still announce the pair
+   correctly. Zero media queries — mobile is 291px against desktop's 310px, so
+   there is no wider breakpoint to answer (§3 of the ruling). */
+
+.registro {
+  display: grid;
+  row-gap: var(--space-2); /* 16px between records */
+  border-top: 1px solid var(--rigo); /* §11.2 — head of the registry column */
+  padding-top: var(--space-2);
+}
 
 .registro__riga {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--space-2);
-  min-height: var(--space-5);
-  padding-block: var(--space-1);
-  align-items: start;
-  border-top: 1px solid var(--rigo);
-}
-
-.registro__riga:last-child {
-  border-bottom: 1px solid var(--rigo);
-}
-
-.registro__etichetta {
-  color: var(--testo-2);
+  grid-template-columns: minmax(0, 1fr); /* one column. There is no second one. */
+  grid-template-rows: auto auto;
+  row-gap: 0; /* the pair is one object, not two lines */
 }
 
 .registro__valore {
+  grid-row: 1;
   margin: 0;
   color: var(--testo);
-  text-align: right;
 }
 
-/* Hairlines resolve to half a device pixel on retina — sharper, and one of
-   the four sanctioned exemptions from the ×8 rule (§6.1). */
-@media (min-resolution: 2dppx) {
-  .registro__riga {
-    border-top-width: 0.5px;
-  }
+.registro__etichetta {
+  grid-row: 2;
+  color: var(--testo-2);
+}
 
-  .registro__riga:last-child {
-    border-bottom-width: 0.5px;
+/* Hairline resolves to half a device pixel on retina — §6.1 exemption 2.
+   One instance now, where there were seven: the rule is demoted, not removed.
+   --rigo and NOT --rigo-forte — scheda 06 already spends both of its permitted
+   --rigo-forte on .chapter--stone__states, and a strong rule here would be the
+   third. It also over-claims: this is "here begins the record", not a new
+   section. No foot rule — head plus foot is a frame is a box is the table
+   again, and the block should close by diminuendo on its quietest element. */
+@media (min-resolution: 2dppx) {
+  .registro {
+    border-top-width: 0.5px;
   }
 }
 
@@ -922,6 +926,8 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   grid-column: 5 / 8;
   grid-row: 1;
   margin: 0;
+  display: grid;
+  row-gap: var(--space-2);
 }
 
 .product__foot {
@@ -945,23 +951,30 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   color: var(--testo-2);
 }
 
+/* The determination stack, extended from the registro — same ruling, same
+   reasoning (docs/registro-dati-ruling.md §1). `1fr auto` was the same second
+   axis under another name: it pushed every value to a right edge nobody reads
+   down, and a right-aligned value column beside a product name is a price
+   list. The datum leads; the label captions it from below.
+
+   No head rule here, unlike the registro. The registro earned one because it
+   lost seven and needed a mark saying "here begins the record"; .product
+   already draws --rigo-forte across the full width immediately above this
+   block, and a second rule under it would be the frame the ruling refuses. */
 .product__row {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--space-2);
-  padding-block: var(--space-1);
-  border-bottom: 1px solid var(--rigo);
-}
-
-.product__row:first-child {
-  border-top: 1px solid var(--rigo);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  row-gap: 0;
 }
 
 .product__data dt {
+  grid-row: 2;
   color: var(--testo-2);
 }
 
 .product__data dd {
+  grid-row: 1;
   margin: 0;
 }
 
@@ -1710,11 +1723,27 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Plates sit IN the field, not on it: the grade is pulled toward the paper
-     so no plate becomes a colour event. --chicco has a 2% budget and
-     photography is what spends it (art-direction §4.4). */
+  /* Plates sit IN the field, not on it — but that is achieved in the CAMERA,
+     not here. §9.3: the photographic ground IS --carta, paper edge to edge, so
+     "the image and the page share a substrate". A plate whose ground is
+     #E9E3D6 renders at Δ0,0,0 from the adjacent page with no CSS at all
+     (measured, scripts/ad-blend-probe.mjs).
+
+     `mix-blend-mode: multiply` was removed here on 2026-07-29. It had never
+     rendered — the plate's own `z-index: 1` isolates it — it is barred from
+     this element by the 2026-07-26 signature amendment, and when forced to
+     engage it RAISED ch07's saturated fraction from 15.3% to 21.2% against a
+     2% budget, the exact opposite of what it was written to do.
+     docs/piastre-blend-ruling.md §2.
+
+     The filter below is on notice, NOT ratified: §9.5 owns the grade and it
+     belongs baked in the file. scripts/build-brand.mjs applies it;
+     scripts/build-piastre.mjs does not, so this line is standing in for a
+     grade six of eight assets never received — while double-grading the two
+     that did. It comes out in the same commit that moves the §9.5 grade into
+     build-piastre.mjs and rebuilds the derivatives, and NOT BEFORE: deleting
+     it alone takes ch07 from 15.3% to 27.9%. Ruling §3, §4.2. */
   filter: saturate(0.72) contrast(1.04);
-  mix-blend-mode: multiply;
 }
 
 .piastra__caption {
@@ -1964,8 +1993,13 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
      them by 25%, which made the only element capable of carrying scale on a
      phone nearly invisible. Values below are the measured ceiling that keeps
      --pietra-testo above 4.5:1 at 390px. */
+  /* 0.075 measured 4.47:1 against --pietra-testo at 390px — BELOW the 4.5 AA
+     floor, in the shipped build. The earlier tuning missed it. Swept under the
+     real text boxes with text hidden: 0.070 → 4.48, 0.065 → 4.52, 0.060 →
+     4.59. 0.065 passes by 0.02 and a 0.02 margin on an accessibility floor is
+     not a margin. docs/piastre-blend-ruling.md §4.3. */
   .scheda .piastra--campitura .piastra__img {
-    --campitura-opacity: 0.075;
+    --campitura-opacity: 0.06;
   }
 
   .chapter--stone .piastra--campitura .piastra__img {

@@ -518,32 +518,85 @@ test.describe("OTTO full experience", () => {
     test.skip(testInfo.project.name !== "mobile", "Mobile-only rail behaviour");
 
     await expect(page.locator("html")).toHaveAttribute("data-experience", "enhanced");
+    /*
+     * The label is visible for MS.slow — 640ms — and the same timeout CLEARS
+     * its text. Any assertion that samples the DOM after the click is racing
+     * that timer, and the click also scrolls the page, so the first sample can
+     * land after the reset and read "undefined|". Two earlier versions of this
+     * test failed roughly one run in two for exactly that reason.
+     *
+     * So don't sample: record. The observer is installed BEFORE the click and
+     * latches the first state in which the label is visible, which makes the
+     * assertion independent of when the test gets round to looking.
+     */
+    await page.evaluate(() => {
+      const label = document.querySelector<HTMLElement>(".rail__touch-label");
+      if (!label) throw new Error("Touch label not found.");
+      const store = window as unknown as { __touchLabel?: string };
+      store.__touchLabel = undefined;
+      new MutationObserver(() => {
+        if (label.dataset.visible === "true" && store.__touchLabel === undefined) {
+          store.__touchLabel = `${label.dataset.visible}|${label.textContent?.trim()}`;
+        }
+      }).observe(label, { attributes: true, childList: true, characterData: true, subtree: true });
+    });
+
     const firstLink = page.locator(".rail__link").first();
     await firstLink.click();
     const touchLabel = page.locator(".rail__touch-label");
-    await expect(touchLabel).toHaveAttribute("data-visible", "true");
-    await expect(touchLabel).toHaveText("La varietà");
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __touchLabel?: string }).__touchLabel),
+      )
+      .toBe("true|La varietà");
     await expect(touchLabel).not.toHaveAttribute("data-visible", "true", { timeout: 1200 });
   });
 
-  test("clips the hero through the viewport edge at all five QA widths", async ({
+  test("sets the hero title in three whole lines at all five QA widths", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "Five-width audit runs once");
-
+    /*
+     * This test used to require the opposite: 4–16% of the second line running
+     * off the right edge at every width, which was the cover's signature
+     * gesture. The client retired it on 2026-07-29 — the overhang read as an
+     * error rather than as intent — and the title now breaks where the name
+     * breaks: Mais Rosso / Ottofile / Integrale.
+     *
+     * What is guarded now is that those are three lines and not four: the
+     * break belongs to the content, so no line may wrap on its own, and none
+     * may leave the field. See the note on `hero.lines` in site.ts.
+     */
     for (const width of [390, 768, 1280, 1440, 1920]) {
       await page.setViewportSize({ width, height: 1000 });
-      const metrics = await page.locator(".hero__title-line--wide > span").evaluate((line) => {
-        const box = line.getBoundingClientRect();
-        return {
-          clipped: (Math.max(0, box.right - window.innerWidth) / box.width) * 100,
-          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-        };
-      });
+      const metrics = await page.locator(".hero__title-line > span").evaluateAll((lines) =>
+        lines.map((line) => {
+          const range = document.createRange();
+          range.selectNodeContents(line);
+          const rects = [...range.getClientRects()];
+          return {
+            text: (line.textContent ?? "").trim(),
+            visualLines: rects.length,
+            overhang: Math.max(...rects.map((r) => r.right)) - window.innerWidth,
+          };
+        }),
+      );
 
-      expect(metrics.clipped, `${width}px clip`).toBeGreaterThanOrEqual(4);
-      expect(metrics.clipped, `${width}px clip`).toBeLessThanOrEqual(16);
-      expect(metrics.overflow, `${width}px overflow`).toBeLessThanOrEqual(0);
+      expect(
+        metrics.map((m) => m.text),
+        `${width}px lines`,
+      ).toEqual(["Mais Rosso", "Ottofile", "Integrale"]);
+      for (const line of metrics) {
+        expect(line.visualLines, `${width}px — "${line.text}" must not wrap`).toBe(1);
+        expect(line.overhang, `${width}px — "${line.text}" leaves the field`).toBeLessThanOrEqual(
+          0,
+        );
+      }
+
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `${width}px overflow`).toBeLessThanOrEqual(0);
     }
   });
 
@@ -552,7 +605,7 @@ test.describe("OTTO full experience", () => {
 
     // Deliberately NOT toHaveCount(n). The previous assertion hard-coded three
     // and shipped alongside the copy "Non una gamma. Tre." — which was false:
-    // the real catalogue also includes Birra and Amaro del Dottore. The
+    // the real catalogue also included Birra and, then, Amaro del Dottore. The
     // section must absorb a new product with no code change, so the test may
     // not re-introduce the assumption it exists to prevent.
     const count = await products.count();
@@ -603,82 +656,11 @@ test.describe("OTTO full experience", () => {
     await expect(birra).not.toContainText("75 cl");
     await expect(birra.locator(".product__cta")).toHaveCount(1);
 
-    // The Amaro's provenance is unknown, and the register says so rather than
-    // guessing. It is NOT visually demoted for it — see the dedicated test.
-    const amaro = products.filter({ hasText: "Amaro del Dottore" }).first();
-    await expect(amaro).toHaveAttribute("data-status", "parziale");
-    await expect(amaro).toContainText("Da verificare");
-  });
-
-  test("attributes no unconfirmed provenance to the Amaro", async ({ page }) => {
-    const amaro = page.locator('[data-product="amaro"]');
-    await expect(amaro).toHaveCount(1);
-    const text = (await amaro.innerText()).toLowerCase();
-
-    /*
-     * These exact formulations came from the company's own public website and
-     * were shipped as fact until the client confirmed that the only cultivation
-     * they can stand behind is the Mais Rosso Ottofile.
-     *
-     * The guard is on PHRASES, not words. "erbe", "botanico" and "officinali"
-     * are all legitimate once the real composition arrives — banning them would
-     * block the correct copy along with the wrong copy.
-     */
-    const unconfirmed = [
-      "orto botanico",
-      "coltivate in azienda",
-      "coltivato in azienda",
-      "erbe aziendali",
-      "botaniche aziendali",
-      "botaniche coltivate",
-      "erbe officinali",
-      "agricoltura simbiotica",
-      "biologic",
-    ];
-    for (const phrase of unconfirmed) {
-      expect(text, `"${phrase}" is not confirmed for the Amaro`).not.toContain(phrase);
-    }
-
-    // Nothing else about it is known either: no strength, no format, no method.
-    expect(text).not.toMatch(/\d+\s*(%|°|cl|ml|l\b)/);
-    for (const phrase of ["gradazione", "infusione", "distiller", "laboratorio", "ingredienti"]) {
-      expect(text, `"${phrase}" is not on record`).not.toContain(phrase);
-    }
-
-    // A partial record is still a product: full-strength name, no empty rows,
-    // and the same way to enquire as everything else.
-    await expect(amaro.locator(".product__cta")).toHaveCount(1);
-    await expect(amaro.locator(".product__name")).toHaveText("Amaro del Dottore");
-    const rows = amaro.locator(".product__row");
-    await expect(rows).toHaveCount(1); // origin only — no blank format or specs
-    for (let i = 0; i < (await rows.count()); i += 1) {
-      await expect(rows.nth(i).locator("dd")).not.toBeEmpty();
-    }
-  });
-
-  test("does not visually demote the Amaro for having a partial record", async ({ page }) => {
-    // Incomplete data must not read as a lesser product. The dimmed treatment
-    // is reserved for entries with no verified description at all.
-    const amaroName = page.locator('[data-product="amaro"] .product__name');
-    const birraName = page.locator('[data-product="birra"] .product__name');
-
-    const [amaroColor, birraColor] = await Promise.all([
-      amaroName.evaluate((el) => getComputedStyle(el).color),
-      birraName.evaluate((el) => getComputedStyle(el).color),
-    ]);
-    expect(amaroColor).toBe(birraColor);
-
-    const [amaroSize, birraSize] = await Promise.all([
-      amaroName.evaluate((el) => getComputedStyle(el).fontSize),
-      birraName.evaluate((el) => getComputedStyle(el).fontSize),
-    ]);
-    expect(amaroSize).toBe(birraSize);
-
-    // And the row itself is a solid register entry, not a provisional one.
-    const borderStyle = await page
-      .locator('[data-product="amaro"]')
-      .evaluate((el) => getComputedStyle(el).borderTopStyle);
-    expect(borderStyle).toBe("solid");
+    // Amaro del Dottore was removed from the catalogue by the client on
+    // 2026-07-29. No product currently carries a partial record, so there is
+    // nothing to assert here — and deliberately no assertion that the range
+    // is all-complete either: that would be the hard-coded assumption this
+    // test exists to prevent, in a new costume.
   });
 
   test("keeps the maize the protagonist of the Birra, not the brewery", async ({ page }) => {
@@ -869,7 +851,11 @@ test.describe("OTTO full experience", () => {
       expect(text, `"${banned}" must not appear`).not.toContain(banned);
     }
     // And it says so out loud, rather than leaving the reader to discover it.
-    expect(text).toContain("non vende online");
+    // Matched on the statement, not on a conjugation: the contact section
+    // moved to the first person on 2026-07-29 — it is the company addressing
+    // the reader, not the register describing a third party — and "non vende"
+    // became "non vendiamo". What must hold is that the sentence is there.
+    expect(text).toMatch(/non vend(e|iamo) online/);
   });
 
   test("explains what happens after contact, and where to buy in person", async ({ page }) => {

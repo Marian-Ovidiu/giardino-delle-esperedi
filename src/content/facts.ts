@@ -51,10 +51,12 @@ export const company = {
 
 /**
  * The protagonist ingredient, and the ONLY cultivation the client has
- * confirmed. Farina, Maisette, Maissini and Birra all descend from it. The
- * Amaro's provenance is unknown and must not be attributed to it — nor to any
- * other company cultivation. Do not reintroduce "every product descends from
- * it": it is still not true, just for a different reason than before.
+ * confirmed. Every product currently in the catalogue descends from it.
+ *
+ * That is true again only because the Amaro left the catalogue on 2026-07-29.
+ * Do not write it into the copy as a standing claim: it is a fact about the
+ * present range, not a rule about the company, and the next product whose
+ * provenance is unconfirmed makes it false again.
  */
 export const grain = {
   name: "Mais Rosso Ottofile",
@@ -87,7 +89,7 @@ export const grain = {
   },
 } as const;
 
-export type ProductId = "farina" | "maisette" | "maissini" | "maisotti" | "birra" | "amaro";
+export type ProductId = "farina" | "maisette" | "maissini" | "maisotti" | "birra";
 
 export interface Product {
   id: ProductId;
@@ -158,8 +160,10 @@ export type RecordStatus = "completo" | "parziale" | "in-preparazione";
  *
  * An `"orto-botanico"` value existed here until 2026-07-27 and has been
  * removed deliberately. It came from the company's own public website, which
- * describes an orto botanico aziendale supplying the Amaro's herbs — and the
- * client has since told us that claim is not something we can stand behind.
+ * described an orto botanico aziendale supplying the herbs of the Amaro del
+ * Dottore — and the client has since told us that claim is not something we
+ * can stand behind. The Amaro itself left the catalogue on 2026-07-29; the
+ * ban outlives it and applies to any future botanical product.
  * The enum member is gone rather than left unused, so it cannot be reattached
  * to a product by autocomplete. If the client ever confirms it, add it back
  * with the confirmation on file.
@@ -336,57 +340,25 @@ export const products: readonly Product[] = [
     origin: "mais",
     status: "completo",
   },
-  {
-    id: "amaro",
-    name: "Amaro del Dottore",
-    /*
-     * KEPT, 2026-07-28, after investigation — and the investigation is worth
-     * recording, because the first answer was to remove it.
-     *
-     * It appears in NONE of the 2026 materials: not in the brochure's "I
-     * nostri prodotti", not in the presentation letter, and the letter counts
-     * the range out loud as "Cinque prodotti". On that evidence alone this
-     * entry looks superseded.
-     *
-     * It is not. It is standing on the table in the client's own brochure
-     * photograph on page 4 — a botanical label reading AMARO DEL DOTTORE ·
-     * CRAFT BITTER, carrying the Giardino delle Esperidi tree seal. So the
-     * product is real and it is theirs; it is simply not part of the Mais
-     * Rosso Co. line, which is what those five products are. This site is the
-     * company's register, not the maize line's catalogue, and deleting a real
-     * product because a maize brochure did not list it would be a worse error
-     * than carrying a partial record.
-     *
-     * "Craft bitter" is legible on that label and is deliberately NOT written
-     * into the record below: a category read off a low-resolution photograph
-     * of a bottle on a table is not a confirmation.
-     * TODO(cliente): l'Amaro del Dottore fa parte della gamma? Se sì servono
-     * formato, gradazione e composizione; se no, questa voce esce dal registro.
-     *
-     * The product and its name are confirmed. NOTHING about its provenance is.
-     *
-     * This card previously read "Prodotto con le erbe officinali dell'orto
-     * botanico aziendale, coltivate con agricoltura simbiotica" — sourced from
-     * the company's own public website. The client has since confirmed that
-     * the only cultivation we can stand behind is the Mais Rosso Ottofile, so
-     * that sentence asserted four things we cannot support: which botanicals
-     * are in it, who grows them, that they come from the company, and how they
-     * are farmed.
-     *
-     * The replacement claims nothing. Do not reintroduce, in any wording:
-     * "orto botanico", "erbe officinali", "coltivate in azienda", "botaniche
-     * aziendali", or a farming method. Unknown too, and equally not to be
-     * invented: the botanicals, the transformer, the format, the strength, the
-     * ingredients and the infusion method. There is a test guarding this.
-     *
-     * When the composition arrives it goes in `formats` and `specs` below and
-     * renders with no change to any component or stylesheet.
-     */
-    definition: "L'amaro botanico della collezione aziendale",
-    formats: [],
-    origin: "da-verificare",
-    status: "parziale",
-  },
+  /*
+   * "Amaro del Dottore" was carried here as a partial record until 2026-07-29,
+   * when the client confirmed it is no longer in the catalogue. The TODO that
+   * stood open on this entry — «fa parte della gamma? Se no, questa voce esce
+   * dal registro» — is answered, and the entry is out.
+   *
+   * Worth keeping, because the first instinct was right for the wrong reason:
+   * it appeared in none of the 2026 materials and the letter counted the range
+   * as five, so it looked superseded. It was kept anyway on the evidence of a
+   * bottle standing on a table in the client's own brochure photograph. That
+   * was the correct call at the time — a real product is not deleted because a
+   * maize brochure omits it — and it took an answer from the client, not more
+   * inference from photographs, to settle it.
+   *
+   * `Origin["da-verificare"]` and `status: "parziale"` survive with no product
+   * using them. They are deliberate: the register's ability to declare that it
+   * does not know something is what makes the rest of it credible, and the
+   * next partial record must not have to reinvent it.
+   */
 ] as const;
 
 /*

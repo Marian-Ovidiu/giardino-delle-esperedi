@@ -61,7 +61,14 @@
 
   /* — § 3.3 · type scale, desktop ≥1280 ———————————————————————— */
   --type-d0-size: clamp(96px, 9.2vw, 208px);
-  --type-d0-lh: 0.88; /* the ONLY unitless line-height on the site */
+  /* The ONLY unitless line-height on the site. 0.98, not 0.88: at 0.88 three
+     lines of Bodoni set solid and the ascenders of one line ran into the
+     descenders of the one above. The extra leading is paid for out of space
+     the cover already had — the hero is bottom-aligned on desktop so the
+     block grows UPWARD into the paper above it, and top-aligned on mobile
+     where it eats the trailing gap the client wanted smaller anyway. Neither
+     breakpoint gets taller. */
+  --type-d0-lh: 0.98;
   --type-d1-size: 96px;
   --type-d1-lh: 88px;
   --type-d2-size: 72px;

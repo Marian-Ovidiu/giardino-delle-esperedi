@@ -49,13 +49,41 @@ export const nav = {
 } as const;
 
 export const hero = {
-  /** Bodoni, bottom-left. The final word is clipped by the viewport edge. */
-  display: "Mais Rosso Ottofile Integrale",
-  /** The word CSS must clip — it does not fit, and that is the point. */
-  clippedWord: "Integrale",
+  /**
+   * Bodoni, three lines. The breaks are CONTENT, not styling: the title breaks
+   * where the name breaks, and never wherever the column happens to run out.
+   *
+   * Until 2026-07-29 this was two lines with "Integrale" deliberately running
+   * past the right edge — the cover's signature gesture, guarded by a test
+   * that required 4–16% of the line to be off-screen at five widths. The
+   * client asked for the break after "Ottofile" instead, on the grounds that
+   * the overhang read as an error at every width and left dead paper below.
+   * Retiring it is his call; the consequence is that the cover no longer has
+   * a gesture, only a setting. Flagged to the Art Director.
+   */
+  lines: ["Mais Rosso", "Ottofile", "Integrale"],
   meta: "Varietà Albese · Cherasco (CN) · Registro · 8 schede",
 } as const;
 
+/*
+ * VOICE, fixed 2026-07-29. Two registers, and the line between them is not
+ * stylistic.
+ *
+ * The schede are a RECORD ABOUT THE VARIETY — the company is a party named in
+ * it, not the narrator — so they carry no "we". Where a statement is the
+ * company's own and cannot be verified, the sentence names its source rather
+ * than an actor: "Il metodo dichiarato è…", "La tradizione aziendale ne
+ * racconta…". content-plan.md §8 requires that attribution for agricoltura
+ * simbiotica and for the Vittorio Emanuele origin, and it is a regulatory
+ * decision, not a preference. Do not rewrite either in the first person.
+ *
+ * `contatti` is the opposite: there the company addresses the reader directly
+ * and speaks as "noi". Until this date it said "l'azienda risponde", which
+ * read as an intermediary describing a third party — an artefact of replacing
+ * the company NAME with a generic noun during the rename, since a brand using
+ * its own name in the third person is ordinary Italian and a common noun is
+ * not.
+ */
 export const chapters: readonly Chapter[] = [
   {
     n: "01",
@@ -67,10 +95,13 @@ export const chapters: readonly Chapter[] = [
       // Was "la semina, la raccoglie e la trasforma". Same three verbs, now
       // with the three process facts the client states in writing: in purezza,
       // a mano, al sole.
-      "L'azienda la semina in purezza, la raccoglie a mano e la essicca al sole, a Cherasco, in un'oasi protetta tra Langhe e Cuneese.",
+      "La seminiamo in purezza, la raccogliamo a mano e la essicchiamo al sole, a Cherasco, in un'oasi protetta tra Langhe e Cuneese.",
     ],
     data: [
-      { label: "Specie", value: "Mais" },
+      // "Specie — Mais" removed 2026-07-29. On a page headlined MAIS ROSSO
+      // OTTOFILE INTEGRALE it restated the h1, and it was the most spec-sheet
+      // shaped row in the set: the one datum a reader already had. Art
+      // Director recommendation, docs/registro-dati-ruling.md.
       { label: "Varietà", value: "Ottofile · Albese" },
       { label: "Appellativo", value: "il mais del Re" },
       { label: "Località", value: "Cherasco (CN), Piemonte" },
@@ -91,7 +122,7 @@ export const chapters: readonly Chapter[] = [
       // Vittorio Emanuele II ad imporne la semina" — and the site does not.
       // Pollenzo and the hills sit INSIDE the attributed clause, where they
       // are part of what the company recounts rather than part of the record.
-      "Il soprannome «mais del Re» accompagna ancora oggi la varietà. L'azienda ne racconta l'origine come una disposizione di semina attribuita a Vittorio Emanuele II, sulle colline piemontesi e nella tenuta di Pollenzo.",
+      "Il soprannome «mais del Re» accompagna ancora oggi la varietà. La tradizione aziendale ne racconta l'origine come una disposizione di semina attribuita a Vittorio Emanuele II, sulle colline piemontesi e nella tenuta di Pollenzo.",
     ],
     data: [
       { label: "Fonte", value: "tradizione aziendale" },
@@ -144,7 +175,7 @@ export const chapters: readonly Chapter[] = [
     title: "Il campo",
     standfirst: "Agricoltura simbiotica.",
     body: [
-      "L'azienda dichiara di adottare il metodo dell'agricoltura simbiotica.",
+      "Il metodo dichiarato è l'agricoltura simbiotica.",
       // The letter's own words, and the most useful commercial fact in it:
       // there is no warehouse behind this, so the range moves with the year.
       "La filiera va dalla semina alla confezione, senza intermediari. La disponibilità è legata al raccolto.",
@@ -159,7 +190,7 @@ export const chapters: readonly Chapter[] = [
       { label: "Ambiente", value: "oasi protetta tra Langhe e Cuneese" },
     ],
     caption: "Semente.",
-    railFact: "metodo e filiera dichiarati dall'azienda",
+    railFact: "metodo dichiarato e filiera senza intermediari",
   },
   {
     n: "06",
@@ -196,15 +227,15 @@ export const chapters: readonly Chapter[] = [
     body: [
       // Previously named the orto botanico as the Amaro's source. Removed:
       // the only cultivation the client can confirm is the Mais Rosso.
-      "Il Mais Rosso Ottofile è la materia prima principale dell'azienda. Ogni scheda dichiara da che cosa nasce, e dove l'origine non è ancora confermata la scheda lo dice.",
+      "Il Mais Rosso Ottofile è la nostra materia prima principale. Ogni scheda dichiara da che cosa nasce, e dove l'origine non è ancora confermata la scheda lo dice.",
       // The nomenclature fact the packaging makes obvious and the site never
       // said: the maize line has its own mark. Company name and brand name are
       // two different things, and the register should not blur them.
-      "Le referenze di mais escono con il marchio Mais Rosso Co. I prezzi sono quelli del listino aziendale; l'acquisto passa dall'azienda.",
+      "Le referenze di mais escono con il marchio Mais Rosso Co. I prezzi sono quelli del listino aziendale; l'acquisto passa da noi.",
       "Il catalogo è aperto. Alcune schede sono ancora parziali.",
     ],
     data: [],
-    railFact: "le referenze dell'azienda, dal mais in avanti",
+    railFact: "le referenze, dal mais in avanti",
   },
   {
     n: "08",
@@ -337,7 +368,7 @@ export const contatti = {
       moment answers the reader's actual question in three words. */
   title: "Come acquistare",
   standfirst:
-    "L'azienda non vende online. Le referenze si richiedono direttamente all'azienda, oppure si acquistano di persona alle fiere.",
+    "Non vendiamo online. Le referenze si richiedono direttamente a noi, oppure si acquistano di persona alle fiere.",
 
   /** What happens after contact. Describes the exchange, promises nothing. */
   percorso: [
@@ -349,12 +380,12 @@ export const contatti = {
     {
       n: "02",
       title: "Ricevi le disponibilità",
-      body: "L'azienda risponde con le disponibilità aggiornate e le modalità di acquisto.",
+      body: "Rispondiamo con le disponibilità aggiornate e le modalità di acquisto.",
     },
     {
       n: "03",
       title: "Vi accordate",
-      body: "Quantità e modalità si definiscono direttamente con l'azienda.",
+      body: "Quantità e modalità si definiscono insieme.",
     },
   ],
 
@@ -377,7 +408,7 @@ export const contatti = {
       id: "telefono",
       label: "Telefono",
       action: "338 286 6127",
-      note: "Per parlare direttamente con l'azienda.",
+      note: "Per parlare direttamente con noi.",
       // DM Mono owns numerals absolutely (§3.7.4). Bodoni is a defect here.
       type: "t-num",
       href: company.phoneHref,
@@ -401,10 +432,10 @@ export const contatti = {
   fiere: {
     label: "Di persona",
     title: "Le fiere",
-    body: "L'azienda porta le sue referenze alle fiere a cui partecipa: è l'occasione per vedere i prodotti e parlare direttamente con chi li coltiva.",
+    body: "Portiamo le referenze alle fiere a cui partecipiamo: è l'occasione per vedere i prodotti e parlare direttamente con chi li coltiva.",
     // Deliberately not "calendario in aggiornamento", which would imply a
     // calendar exists somewhere. It simply is not published here.
-    note: "Il calendario non è ancora pubblicato su questo sito. Per sapere dove trovare l'azienda, scrivi o segui i canali social.",
+    note: "Il calendario non è ancora pubblicato su questo sito. Per sapere dove trovarci, scrivi o segui i canali social.",
   },
 
   /** Trust block: a real address, a real name, a real phone. */

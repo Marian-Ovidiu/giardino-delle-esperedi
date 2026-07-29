@@ -104,7 +104,25 @@ export const media: Record<MediaKey, MediaAsset | null> = {
    * material study carries the age of the variety without depicting an event.
    */
   "re-materia": {
-    src: "/images/generated/piastre/re-materia.avif",
+    /*
+     * PROVA 2026-07-29 — was re-materia.avif.
+     *
+     * The trial source is 2048×2048, i.e. 1:1. That IS one of the two ratios
+     * §8 permits, but it is the REPERTO ratio, and this slot is a lastra: the
+     * declared 1600×1000 below is deliberately not changed to match it, so the
+     * frame stays 8:5 and object-fit: cover centre-crops the square. Roughly a
+     * fifth is lost off the top and the same off the bottom — what renders is
+     * the middle band, not the picture as generated. Changing the declaration
+     * would turn a bleeding lastra into a reperto, which is an Art Director
+     * call and not a media-registry one.
+     *
+     * Also a 2.8 MB PNG against the 187 KB AVIF it replaces: fine to look at,
+     * not to ship. Filename carries no version because the client renamed it
+     * deliberately — but overwriting a served path in place is what made the
+     * browser hold the previous generation for four hours (Cache-Control
+     * max-age=14400 on /_next/image). Next iteration gets a new name.
+     */
+    src: "/images/generated/piastre/re-materia-test.png",
     alt: "Brattee secche di mais su fondo chiaro, in luce radente.",
     caption: "Brattee secche.",
     width: 1600,
@@ -115,13 +133,23 @@ export const media: Record<MediaKey, MediaAsset | null> = {
 
   /* ch04 — Quasi estinto. REPERTO, a real 1:1 cut from the master. */
   "quasi-estinto-reperto": {
-    src: "/images/generated/piastre/atmosfera-luce-1x1.avif",
+    /*
+     * PROVA 2026-07-29 — was atmosfera-luce-1x1.avif. Same trial source as the
+     * mobile slot below, because a plate that changed on phones and not on
+     * desktop is confusing rather than deliberate.
+     *
+     * The source is 3:2 and this slot is 1:1, so object-fit: cover keeps the
+     * middle two thirds and drops a sixth off each side — a heavier crop than
+     * the mobile slot's 6%. The declared 1200×1200 stays: §8.5 gives ch04 the
+     * reperto ratio above 768px and that is not a media-registry decision.
+     */
+    src: "/images/generated/piastre/atmosfera-luce.png",
     alt: "Polvere sospesa in una lama di luce radente.",
     caption: "Luce.",
     width: 1200,
     height: 1200,
     status: "provvisorio",
-    source: "Higgsfield nano_banana_pro — atmospheric plate, 1:1 derivative",
+    source: "Higgsfield nano_banana_pro — atmospheric plate, prova 2026-07-29",
   },
 
   /*
@@ -131,13 +159,29 @@ export const media: Record<MediaKey, MediaAsset | null> = {
    * in the permitted 8:5, so the chapter keeps its visual on every device.
    */
   "quasi-estinto-mobile": {
-    src: "/images/generated/piastre/atmosfera-luce.avif",
+    /*
+     * PROVA 2026-07-29 — was atmosfera-luce.avif.
+     *
+     * Source is 2016×1344, i.e. 3:2. Not one of the two ratios §8 permits, but
+     * close to 8:5: object-fit: cover trims about 6% off the top and the same
+     * off the bottom, against the 20% a square source loses. The declared
+     * 1600×1000 stays, so the reserved space and the page rhythm do not move.
+     *
+     * 2.0 MB PNG against the 47 KB AVIF it replaces — 43×. Fine for judging
+     * the picture, not for shipping; the ship version goes back through
+     * scripts/build-piastre.mjs for the 8:5 crop and the AVIF encode.
+     *
+     * This slot is MOBILE ONLY (<768px). ch04 on desktop and tablet renders
+     * the 1:1 reperto above, which is untouched — so this swap is invisible
+     * unless you look at a phone width.
+     */
+    src: "/images/generated/piastre/atmosfera-luce.png",
     alt: "Polvere sospesa in una lama di luce radente.",
     caption: "Luce.",
     width: 1600,
     height: 1000,
     status: "provvisorio",
-    source: "Higgsfield nano_banana_pro — atmospheric plate, 8:5 derivative",
+    source: "Higgsfield nano_banana_pro — atmospheric plate, prova 2026-07-29",
   },
 
   /* ch05 — Il campo. LASTRA. Deliberately no horizon and no buildings: a
