@@ -1032,14 +1032,14 @@ html[data-prologue-renderer="webgl2"] .prologue-static {
   display: block;
 }
 
-.chapter--custody__myth {
+.chapter--custody__testo {
   grid-column: 2 / 6;
   grid-row: 1;
   color: var(--indice);
   max-width: var(--measure);
 }
 
-.chapter--custody__myth p + p {
+.chapter--custody__testo p + p {
   margin-top: var(--space-5);
 }
 
@@ -1377,7 +1377,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
     grid-column: 1 / 8;
   }
 
-  .chapter--custody__myth,
+  .chapter--custody__testo,
   .chapter--custody__close {
     grid-column: 2 / 7;
   }
@@ -1598,7 +1598,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
 
   .chapter--custody__label,
   .chapter--custody__title,
-  .chapter--custody__myth,
+  .chapter--custody__testo,
   .chapter--custody__close,
   .chapter--custody__final {
     grid-column: 1 / 8;
@@ -1609,7 +1609,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
     margin-top: var(--space-8);
   }
 
-  .chapter--custody__myth,
+  .chapter--custody__testo,
   .chapter--custody__close {
     margin-top: var(--space-5);
   }
@@ -1987,7 +1987,7 @@ html[data-field="notte"] .rail__kernel[data-state="active"] {
    NOT --esperide: gold IS --indice on the night field, so a gold company mark
    converts the index into a brand colour (§4.4 illegal use #5).
    NOT --carta: at 15.37:1 it becomes the highest-contrast object in the frame
-   and the eye reaches it before the myth — the same failure, different token.
+   and the eye reaches it before the text — the same failure, different token.
    ========================================================================= */
 
 .marchio {

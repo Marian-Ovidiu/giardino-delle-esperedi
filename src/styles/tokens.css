@@ -21,7 +21,14 @@
   --pietra: #8c8779; /* rules/marks on day; secondary TEXT on night      */
   --chicco: #b23a16; /* the kernel's measured red-orange — INDEX ONLY    */
   --notte: #0d0b08; /* night field                                      */
-  --esperide: #d9a441; /* Hesperides gold — on --notte only               */
+  --esperide: #d9a441; /* gold, = --indice on --notte ONLY (see note)     */
+
+  /* --esperide is named after the Hesperides, and the myth it came from was
+     removed from the site on 2026-07-29 with the company name. The TOKEN is
+     deliberately not renamed yet: gold survives on function, not on story —
+     it is --indice on the night field — and renaming it now, before the new
+     name exists, would mean renaming it twice. Rename it with the rebrand.
+     See docs/nome-transizione.md. */
 
   /* — § 6.1 · spacing, Fibonacci × 8 ——————————————————————————
      No 32, no 48, no 80, no 128. Their absence is the rhythm.            */

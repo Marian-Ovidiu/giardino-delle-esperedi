@@ -13,6 +13,8 @@ uniform float uProgress;
 
 out float vLight;
 out float vVariant;
+out float vSeam;
+out float vSeed;
 
 float easeInOut(float value) {
   value = clamp(value, 0.0, 1.0);
@@ -85,6 +87,17 @@ void main() {
   vec3 normal = normalize(aNormal);
   vLight = dot(normal, normalize(vec3(-0.35, 0.68, 0.64)));
   vVariant = variant;
+
+  // Circumferential position inside the kernel. The flanks — where one row
+  // meets the next — are where the seam shadow lives, and the seam is what
+  // actually draws the eight rows. Taken before the row rotation, so it is
+  // the kernel's own axis and not the cob's.
+  vSeam = abs(normal.z);
+
+  // A true per-kernel seed. vVariant carries index % 8, i.e. eight buckets:
+  // using it for value variance produced a 3.6% spread that was
+  // arithmetically indistinguishable from a constant.
+  vSeed = aMeta.x * 32.0 + aMeta.y;
   gl_Position = uViewProjection * vec4(centre + local, 1.0);
 }
 `;
@@ -94,13 +107,40 @@ precision highp float;
 
 in float vLight;
 in float vVariant;
+in float vSeam;
+in float vSeed;
 out vec4 outColor;
 
 void main() {
-  float diffuse = 0.66 + clamp(vLight * 0.5 + 0.25, 0.0, 1.0) * 0.34;
-  float variation = 0.965 + mod(vVariant, 4.0) * 0.012;
+  /*
+   * 0.50 -> 1.02, replacing 0.66 -> 1.00.
+   *
+   * The old range gave a lit-to-shadow difference of 34% across a kernel,
+   * which composited at 0.18 layer opacity to roughly 6% — about 10 levels of
+   * 8-bit. The volume was modelled and invisible. This is 19 levels: still
+   * quiet, but modelled rather than flat.
+   */
+  float diffuse = 0.50 + clamp(vLight * 0.5 + 0.5, 0.0, 1.0) * 0.52;
+
+  /*
+   * Seam occlusion. Where two rows meet, the flanks fall to 0.38. This is the
+   * term that draws the eight rows — not a drawn line, the shadow between
+   * them. Without it the kernels merge into vertical ridges.
+   */
+  float seam = mix(1.0, 0.38, smoothstep(0.52, 0.98, vSeam));
+
+  /*
+   * Per-kernel value, 0.82 -> 1.06, mean 0.94.
+   *
+   * VALUE ONLY. --chicco is an index colour: its hue may not vary, and
+   * variation toward bordeaux was refused twice (§6.2 prohibition 9, and
+   * docs/prologo-rifinitura.md §6). Every step lighter is paid for by a step
+   * darker, so the aggregate red goes down rather than up.
+   */
+  float variation = 0.82 + fract(sin(vSeed * 12.9898) * 43758.5453) * 0.24;
+
   vec3 chicco = vec3(0.698, 0.227, 0.086);
-  outColor = vec4(chicco * diffuse * variation, 1.0);
+  outColor = vec4(chicco * diffuse * seam * variation, 1.0);
 }
 `;
 
@@ -137,14 +177,22 @@ void main() {
   }
 
   if (aRole > 1.5 && aRole < 2.5) {
-    float huskReveal = smoothstep(0.44, 0.53, uProgress);
+    // 0.34, not 0.44: the husk arrives as the cob closes. Revealing it later
+    // left the pannocchia stage showing a naked cob.
+    float huskReveal = smoothstep(0.34, 0.44, uProgress);
     position.x = mix(-0.78, position.x, huskReveal);
     position.y = mix(-1.92, position.y, huskReveal);
   }
 
   if (aRole > 3.5) {
-    float rachisReveal = smoothstep(0.30, 0.34, uProgress);
-    if (uProgress < 0.30) {
+    /*
+     * 0.44, not 0.30. The rachis used to appear while the cob was still
+     * closing and leaked through a row channel as a hard grey stripe running
+     * the whole length of a red cob — in the one stage that is meant to hold
+     * still. While the cob is closed there is nothing behind it to see.
+     */
+    float rachisReveal = smoothstep(0.44, 0.50, uProgress);
+    if (uProgress < 0.44) {
       position.y = -100.0;
     } else {
       vec3 cobCentre = vec3(-0.78, 0.32, -0.24);
@@ -175,7 +223,23 @@ out vec4 outColor;
 void main() {
   vec3 darkStone = vec3(0.384, 0.365, 0.302);
   vec3 stone = vec3(0.549, 0.529, 0.475);
-  vec3 colour = (vRole < 0.5 || vRole > 3.5) ? darkStone : stone;
+
+  /*
+   * The rachis is part of the ear, so it is a VALUE of --chicco, never stone.
+   * A grey object inside a red one is a category error, and it was reading as
+   * a foreign body rather than as the core the kernels are attached to.
+   */
+  vec3 rachis = vec3(0.698, 0.227, 0.086) * 0.62;
+
+  /*
+   * Three organs, three values — they used to share one grey. The husk is the
+   * LIGHT shape and the cob the DARK one; that opposition is the entire
+   * structure of the reference illustration.
+   */
+  vec3 husk = vec3(0.855);
+  vec3 colour = vRole > 3.5
+    ? rachis
+    : (vRole > 1.5 && vRole < 2.5 ? husk : (vRole < 0.5 ? darkStone : stone));
   outColor = vec4(colour, 1.0);
 }
 `;
@@ -186,6 +250,7 @@ precision highp float;
 layout(location = 0) in vec2 aCorner;
 layout(location = 1) in float aLine;
 layout(location = 2) in float aBand;
+layout(location = 3) in float aRowOffset;
 
 uniform float uProgress;
 uniform float uAspect;
@@ -195,17 +260,27 @@ out float vRelief;
 
 void main() {
   float fieldReveal = smoothstep(0.60, 0.76, uProgress);
+
+  /*
+   * The unroll is continuous, and slow enough to be read as a transformation.
+   * The rows stay individually identifiable through the first 60% of the
+   * window — 0.76 to 0.856 — and only resolve to lines by 0.92. Long enough to
+   * be watched, short enough that it never becomes a demonstration.
+   */
   float flatten = smoothstep(0.76, 0.92, uProgress);
   float lineT = aLine / 7.0;
   vec2 vanishingPoint = vec2(-0.05, -0.12);
-  vec2 nearPoint = vec2(mix(-0.82, 0.72, lineT), -0.92);
+  vec2 nearPoint = vec2(mix(-0.82, 0.72, lineT) + aRowOffset * 0.5, -0.92);
   float along = (aCorner.x + 1.0) * 0.5 * fieldReveal;
   vec2 perspectivePosition = mix(vanishingPoint, nearPoint, along);
-  float irregularLength = 0.70 + mod(aLine * 0.037, 0.055);
+  // aRowOffset is the seeded vertical offset of the kernel row this mark came
+  // from, carried across from topology.ts. It used to be sin(aLine * 2.3) —
+  // a fabricated irregularity that resembled the rows without being them.
+  float irregularLength = 0.70 + abs(aRowOffset) * 1.05;
   float pressure = sin(aCorner.x * 8.0 + aLine * 1.91) * 0.0018;
   vec2 registerPosition = vec2(
-    aCorner.x * irregularLength - 0.05 + sin(aLine * 2.3) * 0.008,
-    mix(-0.68, 0.68, lineT) + pressure
+    aCorner.x * irregularLength - 0.05 + aRowOffset * 0.34,
+    mix(-0.68, 0.68, lineT) + pressure + aRowOffset * 0.22
   );
   float edgeTaper = smoothstep(0.0, 0.16, 1.0 - abs(aCorner.x));
   float pressureWidth = 0.74 + 0.26 * (0.5 + 0.5 * sin(aCorner.x * 11.0 + aLine * 1.37));

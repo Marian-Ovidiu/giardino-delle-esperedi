@@ -207,9 +207,10 @@ test.describe("OTTO full experience", () => {
     await waitForPrologue(page);
     const snapshot = await page.evaluate(() => window.__OTTO_SIGNATURE__?.snapshot());
     const expectedPlants =
-      testInfo.project.name === "desktop" ? 48 : testInfo.project.name === "tablet" ? 32 : 24;
+      testInfo.project.name === "desktop" ? 360 : testInfo.project.name === "tablet" ? 252 : 180;
+    // LOD drops depth bands, never width: 36 plants per band.
     const expectedDepths =
-      testInfo.project.name === "desktop" ? 6 : testInfo.project.name === "tablet" ? 4 : 3;
+      testInfo.project.name === "desktop" ? 10 : testInfo.project.name === "tablet" ? 7 : 5;
     const expectedDepthScale =
       testInfo.project.name === "desktop" ? 1 : testInfo.project.name === "tablet" ? 0.86 : 0.72;
 
@@ -218,7 +219,9 @@ test.describe("OTTO full experience", () => {
       rows: 8,
       drawCalls: 3,
       plantCount: expectedPlants,
-      fieldLaneCount: 8,
+      // fieldLaneCount is deliberately absent: the field is no longer sown in
+      // lanes. Eight rows is a property of one cob, never of a field, and a
+      // lane count put a second eight on a site allowed exactly one.
       fieldDepthCount: expectedDepths,
       depthScale: expectedDepthScale,
       seed: "ottofile-v1",
@@ -296,6 +299,53 @@ test.describe("OTTO full experience", () => {
       .locator("[data-kernel-prologue] .prologue__viewport")
       .evaluate((element) => Number.parseFloat(getComputedStyle(element).opacity));
     expect(restoredOpacity).toBeGreaterThan(0.1);
+  });
+
+  test("puts the campo on screen, and not merely in the draw call", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "Ink measurement runs once");
+    /*
+     * The snapshot counters are not evidence. The far plane sat at 120 while
+     * the camera retreated to z≈166, so every field plant was clipped away
+     * and the campo stage rendered as blank paper — while the snapshot still
+     * reported plantCount 252 and drawCalls 3. This measures ink instead: the
+     * field has to darken meaningfully more of the frame than the single hero
+     * plant that precedes it.
+     */
+    await waitForPrologue(page);
+    const viewport = page.locator("[data-kernel-prologue] .prologue__viewport");
+
+    // The canvas is transparent and the headline shows through it. Measuring
+    // the composited frame measures the typography, which moves with scroll —
+    // an earlier version of this test passed against the clipped build for
+    // exactly that reason. Hide the page and leave the prologue visible.
+    await page.evaluate(() => {
+      document.body.style.visibility = "hidden";
+      const prologue = document.querySelector<HTMLElement>("[data-kernel-prologue]");
+      if (prologue) prologue.style.visibility = "visible";
+    });
+
+    const inkAt = async (progress: number) => {
+      await scrollPrologueTo(page, progress);
+      const shot = await viewport.screenshot();
+      const sharp = (await import("sharp")).default;
+      const { data, info } = await sharp(shot)
+        .greyscale()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let inked = 0;
+      for (let index = 0; index < data.length; index += 1) {
+        if (data[index] < 222) inked += 1;
+      }
+      return inked / (info.width * info.height);
+    };
+
+    const pianta = await inkAt(0.52);
+    const campo = await inkAt(0.74);
+
+    // Measured: 0.026 for the single hero plant, 0.498 for the crop. Clipped,
+    // both collapse to under 0.01.
+    expect(campo).toBeGreaterThan(0.2);
+    expect(campo).toBeGreaterThan(pianta * 4);
   });
 
   test("initialises the correct state from a deep link without shifting", async ({
@@ -738,6 +788,52 @@ test.describe("OTTO full experience", () => {
       expect(text, `"${phrase}" is not verified and may never appear`).not.toContain(phrase);
     }
     await expect(page.locator('[data-product="maissini"]')).toContainText("contiene glutine");
+  });
+
+  test("tells no story about the company name, which is being replaced", async ({ page }) => {
+    /*
+     * The client is changing the name and the domain and has accepted losing
+     * the garden narrative with them. The name still IDENTIFIES the company —
+     * wordmark, footer, recapiti, email domain, privacy policy — and that is
+     * allowed to stay until the new one exists. What may never come back is
+     * the site reading meaning INTO it: the Hesperides myth that chapter 08
+     * was built on, and "il Giardino" used as a narrative character in place
+     * of "l'azienda". See docs/nome-transizione.md.
+     */
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    // Word boundaries, not substrings: "hera" is inside "Cherasco", which is
+    // the town and is staying.
+    const myth = [
+      /\besperidi sono\b/,
+      /\bfrutteto\b/,
+      /\bhera\b/,
+      /\bmele d'oro\b/,
+      /\bninfe\b/,
+      /\btramont/,
+      /\bboschetto\b/,
+      /\bmeli\b/,
+      /\bfrutto d'oro\b/,
+      /\bdorat[aeio]\b/,
+      /\bil nome dell'azienda\b/,
+    ];
+    for (const phrase of myth) {
+      expect(body, `the garden narrative is removed: ${phrase}`).not.toMatch(phrase);
+    }
+
+    // "il Giardino" as a subject that acts — sows, brings, answers. The name
+    // survives only in the fixed strings that identify the company.
+    const main = await page.locator("main").innerText();
+    expect(main).not.toMatch(/\b[Ii]l Giardino\b(?! delle Esperidi)/);
+    for (const phrase of ["del Giardino", "con il Giardino", "trovare il Giardino"]) {
+      expect(main, `"${phrase}" makes the name a character`).not.toContain(phrase);
+    }
+
+    // Chapter 08 still closes the register, on the variety rather than the name.
+    const custodia = page.locator("#custodia");
+    await expect(custodia).toContainText("Custodire");
+    await expect(custodia).toContainText("continua a essere seminata");
+    await expect(custodia).toContainText("Il registro resta aperto");
+    await expect(custodia.locator(".chapter--custody__marchio")).toHaveCount(1);
   });
 
   test("carries no copy that hard-codes the size of the range", async ({ page }) => {

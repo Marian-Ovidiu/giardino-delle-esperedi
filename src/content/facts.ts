@@ -382,17 +382,24 @@ export const products: readonly Product[] = [
      * When the composition arrives it goes in `formats` and `specs` below and
      * renders with no change to any component or stylesheet.
      */
-    definition: "L'amaro botanico della collezione del Giardino",
+    definition: "L'amaro botanico della collezione aziendale",
     formats: [],
     origin: "da-verificare",
     status: "parziale",
   },
 ] as const;
 
-/** The myth behind the company name, as the company itself tells it. */
-export const myth = {
-  garden: "il frutteto di Hera",
-  fruit: "mele d'oro",
-  nymphs: "ninfe della sera e della luce dorata dei tramonti",
-  place: "il lontano ovest dove tramonta il Sole",
-} as const;
+/*
+ * The Hesperides myth was recorded here — Hera's orchard, the golden apples,
+ * the nymphs of the evening — and chapter 08 was built on it.
+ *
+ * Removed 2026-07-29. The client is changing the company name and the domain
+ * and has accepted losing the garden narrative with them. Until the new name
+ * exists the current one stays wherever it identifies the company — footer,
+ * recapiti, email domain, privacy policy, wordmark — and nowhere does the site
+ * draw meaning from it. Do not reintroduce the myth, the golden fruit, the
+ * nymphs, or any reading of "Giardino" and "Esperidi" as words rather than as
+ * a name. There is a test guarding this.
+ *
+ * See docs/nome-transizione.md.
+ */

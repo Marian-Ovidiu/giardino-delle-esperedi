@@ -32,7 +32,6 @@ export type PrologueSnapshot = {
   pointerPitch: number;
   dpr: number;
   plantCount: number;
-  fieldLaneCount: number;
   fieldDepthCount: number;
   depthScale: number;
   drawCalls: number;
@@ -205,7 +204,7 @@ export class PrologueRenderer {
   private readonly field: ProgramInfo;
   private readonly incision: ProgramInfo;
   private readonly kernelIndexCount: number;
-  private readonly fieldVertexCounts: Record<24 | 32 | 48, number>;
+  private readonly fieldVertexCounts: Record<180 | 252 | 360, number>;
   private readonly incisionVertexCount: number;
   private readonly buffers: WebGLBuffer[] = [];
   private progress = 0;
@@ -213,7 +212,7 @@ export class PrologueRenderer {
   private width = 1;
   private height = 1;
   private dpr = 1;
-  private plantCount: 24 | 32 | 48 = 48;
+  private plantCount: 180 | 252 | 360 = 360;
   private depthScale = 1;
   private renderCount = 0;
   private readonly projection = new Float32Array(16);
@@ -261,20 +260,41 @@ export class PrologueRenderer {
     this.buffers.push(createBuffer(gl, 0, 3, fieldMesh.positions));
     this.buffers.push(createBuffer(gl, 1, 1, fieldMesh.roles));
     this.field = { program: fieldProgram, vao: fieldVao };
+    /*
+     * LOD by DEPTH, never by width. 14 plants per depth band, so a shallower
+     * device draws fewer bands and the field keeps its full 34-unit span —
+     * a narrower field would read as a flowerbed again, which is the defect
+     * this change exists to fix.
+     */
     this.fieldVertexCounts = {
-      24: fieldMesh.plantVertexOffsets[24] ?? fieldMesh.primaryVertexCount,
-      32: fieldMesh.plantVertexOffsets[32] ?? fieldMesh.primaryVertexCount,
-      48: fieldMesh.plantVertexOffsets[48] ?? fieldMesh.positions.length / 3,
+      180: fieldMesh.plantVertexOffsets[180] ?? fieldMesh.primaryVertexCount,
+      252: fieldMesh.plantVertexOffsets[252] ?? fieldMesh.primaryVertexCount,
+      360: fieldMesh.plantVertexOffsets[360] ?? fieldMesh.positions.length / 3,
     };
 
     const incisionProgram = createProgram(gl, incisionVertexShader, incisionFragmentShader);
     const incisionVao = gl.createVertexArray();
     if (!incisionVao) throw new Error("Unable to allocate incision VAO.");
     gl.bindVertexArray(incisionVao);
+    /*
+     * The eight closing marks are generated FROM the eight kernel rows.
+     *
+     * They used to be an independent buffer that merely looped to KERNEL_ROWS
+     * — eight marks that RESEMBLED the rows without being them. Each line now
+     * carries its own row's seeded offset, so it inherits the pressure
+     * irregularity of the row it came from and the unroll is one object lying
+     * down rather than a coincidence of counts.
+     *
+     * Proof by continuity, never by enumeration: nobody is asked to count. A
+     * reader who counts finds eight; a reader who does not sees a cob become a
+     * record. Art Director direction, docs/prologo-rifinitura.md §2.
+     */
     const corners: number[] = [];
     const lineIndices: number[] = [];
     const bands: number[] = [];
+    const rowOffsets: number[] = [];
     for (let line = 0; line < KERNEL_ROWS; line += 1) {
+      const rowOffset = topology.rowOffsets[line];
       for (const band of [-2, -1, 0, 1]) {
         for (let segment = 0; segment < 12; segment += 1) {
           const x0 = -1 + (segment / 12) * 2;
@@ -282,12 +302,14 @@ export class PrologueRenderer {
           corners.push(x0, -1, x1, -1, x0, 1, x0, 1, x1, -1, x1, 1);
           lineIndices.push(line, line, line, line, line, line);
           bands.push(band, band, band, band, band, band);
+          rowOffsets.push(rowOffset, rowOffset, rowOffset, rowOffset, rowOffset, rowOffset);
         }
       }
     }
     this.buffers.push(createBuffer(gl, 0, 2, new Float32Array(corners)));
     this.buffers.push(createBuffer(gl, 1, 1, new Float32Array(lineIndices)));
     this.buffers.push(createBuffer(gl, 2, 1, new Float32Array(bands)));
+    this.buffers.push(createBuffer(gl, 3, 1, new Float32Array(rowOffsets)));
     this.incisionVertexCount = lineIndices.length;
     this.incision = { program: incisionProgram, vao: incisionVao };
 
@@ -310,7 +332,7 @@ export class PrologueRenderer {
     const pixelBudgetDpr = Math.sqrt(4_200_000 / (this.width * this.height));
     const dimensionDpr = Math.min(4096 / this.width, 4096 / this.height);
     this.dpr = Math.max(0.1, Math.min(deviceDpr, pixelBudgetDpr, dimensionDpr));
-    this.plantCount = viewport < 768 ? 24 : viewport < 1280 ? 32 : 48;
+    this.plantCount = viewport < 768 ? 180 : viewport < 1280 ? 252 : 360;
     this.depthScale = viewport < 768 ? 0.72 : viewport < 1280 ? 0.86 : 1;
     const width = Math.round(this.width * this.dpr);
     const height = Math.round(this.height * this.dpr);
@@ -349,11 +371,39 @@ export class PrologueRenderer {
     const plantPullback = range(this.progress, 0.44, 0.6);
     const fieldPullback = range(this.progress, 0.6, 0.76);
     const registerPullback = range(this.progress, 0.76, 0.92);
-    this.cameraZ = 12.5 + plantPullback * 9 + fieldPullback * 13 + registerPullback * 4;
-    const targetY = 0.32 - plantPullback * 1.6 - fieldPullback * 1.2;
+    /*
+     * The plant-stage pullback was 12.5 -> 21.5, i.e. 1.7x: the camera barely
+     * moved, so the promised step out from cob to plant never happened. The
+     * stalk is now 48 units tall, so the withdrawal has to match it — 4.2x —
+     * or the plant simply does not fit the frame.
+     */
+    /*
+     * The withdrawal is arithmetic, not taste. At a 28 degree vertical FOV the
+     * visible height is 2 * z * tan(14 deg) = 0.4986 * z. The plant is 54 units
+     * tall including the tassel, so seeing it whole needs z about 108 — an 8.6x
+     * step out from the cob's 12.5. It used to be 1.7x, which is why the
+     * promised move from cob to plant never happened.
+     */
+    this.cameraZ = 12.5 + plantPullback * 96 + fieldPullback * 18 + registerPullback * 40;
+    // And the camera climbs to the plant's centre: the subject was 11 units
+    // tall and is now 54.
+    /*
+     * The camera climbs to the plant's centre, then comes back DOWN for the
+     * field. The subject changes from a 54-unit stalk to a crop standing on
+     * the ground: holding the gaze at y = 24 left the field in the bottom
+     * eighth of the frame, which is most of why it read as empty.
+     */
+    const targetY = 0.32 + plantPullback * 19 - fieldPullback * 13;
     const cameraY = fieldPullback * 3.2 * this.depthScale;
     const aspect = this.width / this.height;
-    perspective(this.projection, (28 * Math.PI) / 180, aspect, 0.1, 120);
+    /*
+     * Far plane 320, not 120. The camera retreats to z≈166 by the register
+     * stage and the deepest field row sits at z≈-87, so the crop stands 250
+     * units from the eye. At 120 the whole field was clipped away and only
+     * the tassel of the hero plant — the one part inside the old plane —
+     * survived, which is why the campo stage rendered as an empty page.
+     */
+    perspective(this.projection, (28 * Math.PI) / 180, aspect, 0.5, 320);
     const targetX = -0.78 * (1 - plantPullback);
     const cameraTarget: [number, number, number] = [
       targetX,
@@ -452,8 +502,10 @@ export class PrologueRenderer {
       pointerPitch: this.pointer[1] * 0.2,
       dpr: this.dpr,
       plantCount: this.plantCount,
-      fieldLaneCount: 8,
-      fieldDepthCount: this.plantCount / 8,
+      // fieldLaneCount removed: the field is no longer sown in lanes, and
+      // publishing a lane count re-asserted the agronomic claim that was the
+      // reason for removing them (topology.ts, createPlantFieldMesh).
+      fieldDepthCount: this.plantCount / 36,
       depthScale: this.depthScale,
       drawCalls: 3,
       renderCount: this.renderCount,

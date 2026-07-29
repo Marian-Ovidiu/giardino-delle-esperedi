@@ -67,7 +67,7 @@ export const chapters: readonly Chapter[] = [
       // Was "la semina, la raccoglie e la trasforma". Same three verbs, now
       // with the three process facts the client states in writing: in purezza,
       // a mano, al sole.
-      "Il Giardino delle Esperidi la semina in purezza, la raccoglie a mano e la essicca al sole, a Cherasco, in un'oasi protetta tra Langhe e Cuneese.",
+      "L'azienda la semina in purezza, la raccoglie a mano e la essicca al sole, a Cherasco, in un'oasi protetta tra Langhe e Cuneese.",
     ],
     data: [
       { label: "Specie", value: "Mais" },
@@ -91,7 +91,7 @@ export const chapters: readonly Chapter[] = [
       // Vittorio Emanuele II ad imporne la semina" — and the site does not.
       // Pollenzo and the hills sit INSIDE the attributed clause, where they
       // are part of what the company recounts rather than part of the record.
-      "Il soprannome «mais del Re» accompagna ancora oggi la varietà. Il Giardino delle Esperidi ne racconta l'origine come una disposizione di semina attribuita a Vittorio Emanuele II, sulle colline piemontesi e nella tenuta di Pollenzo.",
+      "Il soprannome «mais del Re» accompagna ancora oggi la varietà. L'azienda ne racconta l'origine come una disposizione di semina attribuita a Vittorio Emanuele II, sulle colline piemontesi e nella tenuta di Pollenzo.",
     ],
     data: [
       { label: "Fonte", value: "tradizione aziendale" },
@@ -144,7 +144,7 @@ export const chapters: readonly Chapter[] = [
     title: "Il campo",
     standfirst: "Agricoltura simbiotica.",
     body: [
-      "Il Giardino delle Esperidi dichiara di adottare il metodo dell'agricoltura simbiotica.",
+      "L'azienda dichiara di adottare il metodo dell'agricoltura simbiotica.",
       // The letter's own words, and the most useful commercial fact in it:
       // there is no warehouse behind this, so the range moves with the year.
       "La filiera va dalla semina alla confezione, senza intermediari. La disponibilità è legata al raccolto.",
@@ -196,7 +196,7 @@ export const chapters: readonly Chapter[] = [
     body: [
       // Previously named the orto botanico as the Amaro's source. Removed:
       // the only cultivation the client can confirm is the Mais Rosso.
-      "Il Mais Rosso Ottofile è la materia prima principale del Giardino. Ogni scheda dichiara da che cosa nasce, e dove l'origine non è ancora confermata la scheda lo dice.",
+      "Il Mais Rosso Ottofile è la materia prima principale dell'azienda. Ogni scheda dichiara da che cosa nasce, e dove l'origine non è ancora confermata la scheda lo dice.",
       // The nomenclature fact the packaging makes obvious and the site never
       // said: the maize line has its own mark. Company name and brand name are
       // two different things, and the register should not blur them.
@@ -204,16 +204,18 @@ export const chapters: readonly Chapter[] = [
       "Il catalogo è aperto. Alcune schede sono ancora parziali.",
     ],
     data: [],
-    railFact: "le referenze del Giardino, dal mais in avanti",
+    railFact: "le referenze dell'azienda, dal mais in avanti",
   },
   {
     n: "08",
     id: "custodia",
     title: "Custodia",
-    standfirst: "Il nome dell'azienda è la descrizione del lavoro.",
+    // Was "Il nome dell'azienda è la descrizione del lavoro." — the sentence
+    // that made the whole chapter depend on the name. See docs/nome-transizione.md.
+    standfirst: "Iscritta in un registro dal 2007, viva perché ancora seminata.",
     body: [],
     data: [],
-    railFact: "ninfe della sera e della luce dorata dei tramonti",
+    railFact: "una varietà da conservazione, ancora in campo",
   },
 ] as const;
 
@@ -270,16 +272,35 @@ export const catalogo = {
   },
 } as const;
 
-/** Chapter 08 — the single chromatic event. */
+/**
+ * Chapter 08 — the single chromatic event.
+ *
+ * REWRITTEN 2026-07-29. This chapter used to be the Hesperides myth: Hera's
+ * orchard, the golden apples, the nymphs of the evening, closing on "il nome
+ * dell'azienda è la descrizione del lavoro". The client is changing the name
+ * and the domain, so the chapter can no longer rest on what the name means.
+ *
+ * It now rests on the one thing that does not change with the name: the
+ * variety is a conservation variety, and a conservation variety survives only
+ * as long as someone keeps sowing it. Every assertion below is already on the
+ * record in chapters 01, 04 and 05 — the 2007 registration, semina in purezza,
+ * raccolta a mano, essiccazione al sole, disponibilità legata al raccolto.
+ * Nothing new is claimed, and nothing here depends on the company being called
+ * anything in particular.
+ *
+ * `display` holds three lines of ~9 characters. That is a type constraint, not
+ * a style: longer lines break the t-d1 setting at 390px. See
+ * docs/nome-transizione.md.
+ */
 export const custodia = {
   label: "Scheda 08/08",
-  display: ["Custodire", "qualcosa", "di dorato"],
+  display: ["Custodire", "vuol dire", "seminare"],
   body: [
-    "Il Giardino delle Esperidi è il frutteto di Hera. Vi cresce un boschetto di meli che producono mele d'oro, e alle Esperidi è affidato il compito di curarlo e di custodirlo.",
-    "Le Esperidi sono le ninfe della sera e della luce dorata dei tramonti, chiamate così per la loro posizione immaginata nel lontano ovest dove tramonta il Sole.",
+    "Una varietà da conservazione non si difende in un archivio. Il registro ne fissa il nome, la data e la descrizione; la varietà resta viva soltanto finché ogni anno qualcuno la rimette nel terreno.",
+    "L'Ottofile dell'Albese è arrivata fin qui così: seminata in purezza, raccolta a mano, essiccata al sole, un raccolto per volta. La disponibilità è legata al raccolto — quello che c'è è quello che il campo ha dato.",
   ],
   close:
-    "Il nome dell'azienda è la descrizione del lavoro. Un frutto d'oro quasi perduto, e qualcuno che lo tiene in vita seminandolo ogni anno.",
+    "Questo non è un catalogo. È il registro di una varietà che esiste ancora perché continua a essere seminata.",
   final: "Il registro resta aperto",
 } as const;
 
@@ -316,7 +337,7 @@ export const contatti = {
       moment answers the reader's actual question in three words. */
   title: "Come acquistare",
   standfirst:
-    "Il Giardino delle Esperidi non vende online. Le referenze si richiedono direttamente all'azienda, oppure si acquistano di persona alle fiere.",
+    "L'azienda non vende online. Le referenze si richiedono direttamente all'azienda, oppure si acquistano di persona alle fiere.",
 
   /** What happens after contact. Describes the exchange, promises nothing. */
   percorso: [
@@ -333,7 +354,7 @@ export const contatti = {
     {
       n: "03",
       title: "Vi accordate",
-      body: "Quantità e modalità si definiscono direttamente con il Giardino.",
+      body: "Quantità e modalità si definiscono direttamente con l'azienda.",
     },
   ],
 
@@ -380,10 +401,10 @@ export const contatti = {
   fiere: {
     label: "Di persona",
     title: "Le fiere",
-    body: "Il Giardino porta le sue referenze alle fiere a cui partecipa: è l'occasione per vedere i prodotti e parlare direttamente con chi li coltiva.",
+    body: "L'azienda porta le sue referenze alle fiere a cui partecipa: è l'occasione per vedere i prodotti e parlare direttamente con chi li coltiva.",
     // Deliberately not "calendario in aggiornamento", which would imply a
     // calendar exists somewhere. It simply is not published here.
-    note: "Il calendario non è ancora pubblicato su questo sito. Per sapere dove trovare il Giardino, scrivi o segui i canali social.",
+    note: "Il calendario non è ancora pubblicato su questo sito. Per sapere dove trovare l'azienda, scrivi o segui i canali social.",
   },
 
   /** Trust block: a real address, a real name, a real phone. */

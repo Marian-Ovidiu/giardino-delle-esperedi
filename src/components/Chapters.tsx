@@ -318,13 +318,17 @@ export function CustodyChapter() {
       </div>
       <div className="chapter--custody__body field">
         {/*
-          The company mark, facing the myth it is named after: the Esperidi
-          tree IS the orchard of Hera the paragraph beside it describes. It is
-          a citation, not a badge — hence --pietra, and hence no motion.
-          Art Director ruling, docs/brand-signature-ruling.md §3.
+          The company mark. The Art Director ratified this placement as a
+          CITATION rather than a badge — the Esperidi tree standing beside the
+          paragraph that explained the company's name (brand-signature-ruling
+          §3). That paragraph is gone with the name change, so the citation
+          argument no longer holds and the mark is now simply the company
+          signing off its own register. Treatment is unchanged and deliberately
+          so: --pietra, single ink, no motion. It needs re-ratifying against the
+          new mark when there is one. See docs/nome-transizione.md.
         */}
         <span className="chapter--custody__marchio marchio" aria-hidden="true" />
-        <div className="chapter--custody__myth">
+        <div className="chapter--custody__testo">
           {custodia.body.map((paragraph) => (
             <p className="t-d3 t-italic" key={paragraph}>
               {paragraph}
