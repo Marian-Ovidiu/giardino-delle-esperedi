@@ -1,22 +1,47 @@
-import { hero } from "@/content/site";
-import { StaticProloguePlate } from "@/components/StaticProloguePlate";
+import { BrandMark } from "@/components/BrandMark";
+import { MediaFrame, type MediaFrameAsset } from "@/components/MediaFrame";
 
-export function Hero() {
+export interface HeroContent {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  range: string;
+  primaryCta: { label: string; href: string };
+  secondaryCta: { label: string; href: string };
+  seasonalNote?: string | null;
+}
+
+export function Hero({ content, media }: { content: HeroContent; media: MediaFrameAsset }) {
   return (
-    <section className="hero field" aria-labelledby="titolo-principale">
-      <StaticProloguePlate state="dispersion" />
-      <p className="hero__meta t-data">{hero.meta}</p>
-      <div className="hero__display" data-motion="hero-title">
-        {/* One .hero__title-line per line: the outer span is the clipping
-            window the GSAP reveal wipes through, the inner one is what moves.
-            Three of them now, not two — see the note on hero.lines. */}
-        <h1 id="titolo-principale" className="t-d0">
-          {hero.lines.map((line) => (
-            <span className="hero__title-line" key={line}>
-              <span>{line}</span>
-            </span>
-          ))}
-        </h1>
+    <section id="inizio" className="hero" aria-labelledby="hero-title" data-section>
+      <div className="hero__inner layout-grid">
+        <div className="hero__copy">
+          <p className="hero__eyebrow t-label">{content.eyebrow}</p>
+          <h1 id="hero-title" className="hero__title t-display-1">
+            {content.title === "Mais Rosso Co." ? <BrandMark /> : content.title}
+          </h1>
+          <p className="hero__lead t-lead">{content.lead}</p>
+          <p className="hero__range t-body">{content.range}</p>
+          <div className="hero__actions">
+            <a className="button button--primary" href={content.primaryCta.href}>
+              {content.primaryCta.label}
+            </a>
+            <a className="button button--secondary" href={content.secondaryCta.href}>
+              {content.secondaryCta.label}
+            </a>
+          </div>
+          {content.seasonalNote ? (
+            <p className="hero__season t-small">{content.seasonalNote}</p>
+          ) : null}
+        </div>
+
+        <MediaFrame
+          asset={media}
+          className="hero__media"
+          priority
+          ratio="portrait"
+          sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1279px) 58vw, 58vw"
+        />
       </div>
     </section>
   );

@@ -73,4 +73,5 @@ next-env.d.ts
 # Original font downloads are retained locally only; the production sources
 # are the Latin WOFF2 files beside them.
 /src/assets/fonts/*.ttf
+!/src/assets/fonts/LeagueSpartan-Variable.ttf
 /assets/brand/

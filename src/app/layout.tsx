@@ -1,26 +1,30 @@
 import type { Metadata } from "next";
 import { fontVariables } from "@/lib/fonts";
-import { company } from "@/content/facts";
-import { meta } from "@/content/site";
+import { publicBrand } from "@/content/selectors";
+import { metaContent } from "@/content/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-  metadataBase: new URL("https://www.giardino-delle-esperidi.com"),
+  title: metaContent.title,
+  description: metaContent.description,
+  applicationName: publicBrand.name,
   openGraph: {
-    title: meta.title,
-    description: meta.description,
+    title: metaContent.openGraph.title,
+    description: metaContent.openGraph.description,
     locale: "it_IT",
     type: "website",
-    siteName: company.name,
+    siteName: publicBrand.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: metaContent.openGraph.title,
+    description: metaContent.openGraph.description,
   },
   robots: { index: true, follow: true },
 };
 
 export const viewport = {
-  // The field colour, so the browser chrome does not flash white before paint.
-  themeColor: "#E9E3D6",
+  themeColor: "#F5915E",
   colorScheme: "light" as const,
 };
 

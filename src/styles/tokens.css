@@ -1,180 +1,88 @@
-/* ============================================================================
-   OTTO — design tokens
-   Implements docs/art-direction.md §3 (typography), §4 (colour), §5 (grid),
-   §6 (spacing), §12 (motion).
-
-   THREE INVARIANTS:
-     1. Eight is arithmetic, not thematic. Layout values are multiples of 8.
-        Exemptions: 4px kernel, 0.5px hairline, em optical offsets, 1fr columns.
-     2. --chicco never fills anything. Index only, <=2% viewport coverage.
-     3. Exactly one chromatic event (chapter 08). A second dark section is a bug.
-
-   The site ships exactly seven hex values. An eighth is a defect — derive with
-   rgba() or color-mix() instead.
-   ========================================================================= */
-
 :root {
-  /* — § 4.1 · the seven ————————————————————————————————————— */
-  --carta: #e9e3d6; /* unbleached laid paper — day field                */
-  --inchiostro: #16150f; /* warm near-black ink — day primary text           */
-  --pietra-testo: #625d4d; /* day secondary text ONLY (5.15:1 on carta)        */
-  --pietra: #8c8779; /* rules/marks on day; secondary TEXT on night      */
-  --chicco: #b23a16; /* the kernel's measured red-orange — INDEX ONLY    */
-  --notte: #0d0b08; /* night field                                      */
-  --esperide: #d9a441; /* gold, = --indice on --notte ONLY (see note)     */
+  /* Palette extracted from the latest client logo material. */
+  --brand-coral: #f5915e;
+  --brand-cream: #f1dfbf;
+  --brand-petrol: #16607d;
+  --brand-kernel: #c32f24;
+  --brand-bordeaux: #5b1208;
+  --brand-brown: #37240b;
+  --brand-ivory: #fff8ea;
 
-  /* --esperide is named after the Hesperides, and the myth it came from was
-     removed from the site on 2026-07-29 with the company name. The TOKEN is
-     deliberately not renamed yet: gold survives on function, not on story —
-     it is --indice on the night field — and renaming it now, before the new
-     name exists, would mean renaming it twice. Rename it with the rebrand.
-     See docs/nome-transizione.md. */
+  --surface-page: var(--brand-cream);
+  --surface-raised: var(--brand-ivory);
+  --surface-brand: var(--brand-coral);
+  --surface-inverse: var(--brand-petrol);
+  --text-primary: var(--brand-brown);
+  --text-secondary: var(--brand-bordeaux);
+  --text-inverse: var(--brand-cream);
+  --border-default: rgba(55, 36, 11, 0.32);
+  --border-strong: var(--brand-petrol);
+  --focus-light: var(--brand-bordeaux);
+  --focus-dark: var(--brand-ivory);
 
-  /* — § 6.1 · spacing, Fibonacci × 8 ——————————————————————————
-     No 32, no 48, no 80, no 128. Their absence is the rhythm.            */
-  --space-0: 0;
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-5: 40px;
-  --space-8: 64px;
-  --space-13: 104px;
-  --space-21: 168px;
-  --space-34: 272px;
+  --font-sans: var(--font-brand, var(--font-text, "League Spartan")), Arial, Helvetica, sans-serif;
 
-  /* — § 5.3 · grid geometry (desktop default) ——————————————————— */
-  --rail-w: 64px;
-  --pad-left: 64px;
-  --gutter: 24px;
-  --field-max: 1536px;
-  --measure: 592px; /* 74 × 8 — body max-width */
+  --type-display-1: clamp(3.5rem, 7vw, 7.5rem);
+  --type-display-2: clamp(2.75rem, 4.5vw, 5.25rem);
+  --type-display-3: clamp(1.75rem, 2.4vw, 2.75rem);
+  --type-lead: clamp(1.25rem, 1.6vw, 1.625rem);
+  --type-body: clamp(1rem, 1.1vw, 1.125rem);
+  --type-small: clamp(0.875rem, 0.9vw, 0.9375rem);
+  --type-label: clamp(0.75rem, 0.75vw, 0.8125rem);
 
-  /* — § 12 · motion. Three durations. Nothing else. ————————————— */
-  --dur-0: 0ms;
-  --dur-1: 160ms;
-  --dur-2: 320ms;
-  --dur-3: 640ms;
-  --stagger: 40ms;
-  --ease-registro: cubic-bezier(0.2, 0.8, 0.2, 1); /* default            */
-  --ease-uscita: cubic-bezier(0.6, 0, 0.8, 0.2); /* exits              */
-  --ease-inversione: cubic-bezier(0.83, 0, 0.17, 1); /* chapter 08 only    */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
 
-  /* — § 3.3 · type scale, desktop ≥1280 ———————————————————————— */
-  --type-d0-size: clamp(96px, 9.2vw, 208px);
-  /* The ONLY unitless line-height on the site. 0.98, not 0.88: at 0.88 three
-     lines of Bodoni set solid and the ascenders of one line ran into the
-     descenders of the one above. The extra leading is paid for out of space
-     the cover already had — the hero is bottom-aligned on desktop so the
-     block grows UPWARD into the paper above it, and top-aligned on mobile
-     where it eats the trailing gap the client wanted smaller anyway. Neither
-     breakpoint gets taller. */
-  --type-d0-lh: 0.98;
-  --type-d1-size: 96px;
-  --type-d1-lh: 88px;
-  --type-d2-size: 72px;
-  --type-d2-lh: 72px;
-  --type-d3-size: 48px;
-  --type-d3-lh: 56px;
-  --type-d4-size: 32px;
-  --type-d4-lh: 40px;
-  --type-lead-size: 24px;
-  --type-lead-lh: 40px;
-  --type-body-size: 18px;
-  --type-body-lh: 32px;
-  --type-small-size: 15px;
-  --type-small-lh: 24px;
-  --type-label-size: 10px;
-  --type-label-lh: 16px;
-  --type-label-lg-size: 12px;
-  --type-label-lg-lh: 16px;
-  --type-data-size: 11px;
-  --type-data-lh: 16px;
-  --type-data-lg-size: 14px;
-  --type-data-lg-lh: 24px;
-  --type-num-size: 32px;
-  --type-num-lh: 40px;
-  --type-num-lg-size: 64px;
-  --type-num-lg-lh: 64px;
+  --layout-max: 96rem;
+  --layout-padding: clamp(4rem, 5vw, 5rem);
+  --layout-columns: 12;
+  --layout-gap: clamp(1.5rem, 2vw, 2rem);
+  --measure-body: 68ch;
+  --measure-lead: 44ch;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --border-hairline: 1px;
+  --border-signature: 2px;
+
+  --motion-fast: 160ms;
+  --motion-base: 240ms;
+  --motion-slow: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 }
 
-/* — § 3.4 · tablet: ONLY display sizes change.
-     Labels and data are specimen-card artefacts and stay physically
-     identical on every device. That is deliberate. ————————————————— */
 @media (max-width: 1279px) {
   :root {
-    --rail-w: 48px;
-    --pad-left: 24px;
-    --gutter: 16px;
-    --type-d0-size: 9.6vw;
-    --type-d1-size: 72px;
-    --type-d1-lh: 72px;
-    --type-d2-size: 56px;
-    --type-d2-lh: 64px;
-    --type-d3-size: 40px;
-    --type-d3-lh: 48px;
-    --type-num-lg-size: 56px;
-    --type-num-lg-lh: 56px;
+    --layout-padding: clamp(2rem, 4vw, 3rem);
+    --layout-columns: 8;
+    --layout-gap: clamp(1.25rem, 2.5vw, 1.5rem);
   }
 }
 
-/* — § 3.5 · mobile ————————————————————————————————————————— */
 @media (max-width: 767px) {
   :root {
-    --rail-w: 40px;
-    --pad-left: 16px;
-    --gutter: 8px;
-    --type-d0-size: 9vw;
-    --type-d1-size: 48px;
-    --type-d1-lh: 48px;
-    --type-d2-size: 40px;
-    --type-d2-lh: 48px;
-    --type-d3-size: 32px;
-    --type-d3-lh: 40px;
-    --type-d4-size: 32px;
-    --type-d4-lh: 40px;
-    --type-lead-size: 20px;
-    --type-lead-lh: 32px;
-    --type-body-size: 16px;
-    --type-body-lh: 24px;
-    --type-small-size: 14px;
-    --type-small-lh: 24px;
-    --type-num-size: 24px;
-    --type-num-lh: 32px;
-    --type-num-lg-size: 48px;
-    --type-num-lg-lh: 48px;
+    --layout-padding: clamp(1rem, 5vw, 1.5rem);
+    --layout-columns: 4;
+    --layout-gap: 1rem;
+    --type-display-1: clamp(2.75rem, 13vw, 4.5rem);
+    --type-display-2: clamp(2.25rem, 10vw, 3.5rem);
+    --type-display-3: clamp(1.75rem, 8vw, 2.25rem);
   }
 }
 
-@media (min-width: 1664px) {
+@media (prefers-reduced-motion: reduce) {
   :root {
-    --type-d0-size: clamp(96px, 9.8vw, 208px);
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
   }
-}
-
-/* ============================================================================
-   § 4.2 · semantic aliases
-   Components consume aliases, NEVER raw tokens. The night inversion works by
-   re-pointing these on one attribute — nothing else in the system changes.
-   `data-field` has exactly two values. There is no third field.
-   ========================================================================= */
-
-:root,
-[data-field="giorno"] {
-  --campo: var(--carta);
-  --testo: var(--inchiostro);
-  --testo-2: var(--pietra-testo);
-  --rigo: var(--pietra);
-  --rigo-forte: var(--inchiostro);
-  --indice: var(--chicco);
-}
-
-[data-field="notte"] {
-  --campo: var(--notte);
-  --testo: var(--carta);
-  /* the two stone tones swap roles across the inversion: --pietra-testo
-     fails on night (2.99:1), --pietra passes (5.48:1). */
-  --testo-2: var(--pietra);
-  --rigo: rgba(233, 227, 214, 0.24);
-  --rigo-forte: var(--carta);
-  --indice: var(--esperide);
 }
