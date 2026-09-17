@@ -3,14 +3,12 @@ import { ExperienceMotion } from "@/components/ExperienceMotion";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { CustodySection } from "@/components/sections/CustodySection";
-import { FieldSection } from "@/components/sections/FieldSection";
 import { MatterSection } from "@/components/sections/MatterSection";
 import { ProductsSection } from "@/components/sections/ProductsSection";
 import { brandMedia } from "@/content/media";
 import {
   contactContent,
   custodyContent,
-  fieldContent,
   footerContent,
   heroContent,
   matterContent,
@@ -35,16 +33,7 @@ export default function Home() {
       <Header content={navigation} />
       <main id="contenuto">
         <Hero content={heroContent} media={brandMedia.hero} />
-        <MatterSection
-          content={matterContent}
-          cobMedia={brandMedia.matterCob}
-          flourMedia={brandMedia.matterFlour}
-        />
-        <FieldSection
-          content={fieldContent}
-          fieldMedia={brandMedia.field}
-          harvestMedia={brandMedia.harvest}
-        />
+        <MatterSection content={matterContent} cobMedia={brandMedia.matterCob} />
         <ProductsSection content={productsContent} media={productMedia} />
         <CustodySection content={custodyContent} media={brandMedia.custody} />
       </main>

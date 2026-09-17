@@ -3,7 +3,6 @@ import {
   publicBrand,
   publicContacts,
   publicGrain,
-  publicSupplyChain,
   publicTerritory,
   type PublicProduct,
 } from "./selectors";
@@ -67,7 +66,6 @@ const availabilityCta = {
 export const navigation = {
   items: [
     { label: "Il mais", href: "#il-mais" },
-    { label: "Dal campo", href: "#dal-campo" },
     { label: "Prodotti", href: "#prodotti" },
     { label: "Contatti", href: "#contatti" },
   ],
@@ -80,12 +78,8 @@ export const navigation = {
 export const heroContent = {
   eyebrow: publicBrand.kind,
   title: publicBrand.name,
-  lead: `Coltiviamo direttamente il ${publicGrain.name} nei campi ${publicTerritory.fields.replace(/^A/, "a")}. Ne selezioniamo la materia prima e seguiamo qualità, ricette e prodotto finale.`,
-  range:
-    "Farina, gallette, grissini e birra agricola: lavorazioni diverse intorno allo stesso mais.",
+  lead: `Coltiviamo direttamente il ${publicGrain.name}, chiamato anche l'Albese, nei campi ${publicTerritory.fields.replace(/^A/, "a")}. Abbiamo recuperato questo antico mais piemontese estremamente raro e lo trasformiamo in prodotti unici e genuini.`,
   primaryCta: { label: "Scopri i prodotti", href: "#prodotti" },
-  secondaryCta: availabilityCta,
-  seasonalNote: "Semina in primavera · raccolta indicativamente a settembre",
 } as const;
 
 export const matterContent = {
@@ -95,52 +89,6 @@ export const matterContent = {
     `Il ${publicGrain.name} è un ${publicGrain.origin.toLowerCase()}. La granella è ${publicGrain.kernelShape.toLowerCase()}, con un colore tra l'arancio bruciato e il bordeaux. La pannocchia dispone tipicamente i chicchi su otto file.`,
     `${publicGrain.recovery}. Oggi questa varietà è il centro del lavoro di ${publicBrand.name}.`,
   ],
-  facts: [
-    { label: "Origine", value: publicGrain.origin },
-    { label: "Chicco", value: publicGrain.kernelShape },
-    { label: "Colore", value: publicGrain.kernelColor },
-    { label: "Pannocchia", value: "Tipicamente otto file" },
-  ],
-  link: { label: "Vedi cosa ne nasce", href: "#prodotti" },
-} as const;
-
-export const fieldContent = {
-  eyebrow: "Il campo",
-  title: "Ai piedi di Cherasco, secondo il ritmo dell'annata",
-  body: [
-    "I nostri campi si trovano ai piedi di Cherasco. La semina avviene in primavera, indicativamente a maggio; il raccolto arriva indicativamente a settembre.",
-    "Superficie e quantità cambiano di anno in anno. Anche la disponibilità dei prodotti segue l'andamento dell'annata.",
-  ],
-  facts: [
-    { label: "Territorio", value: publicTerritory.fields },
-    { label: "Semina", value: publicTerritory.sowing },
-    { label: "Raccolta", value: publicTerritory.harvest },
-    { label: "Disponibilità", value: publicTerritory.availability },
-  ],
-  transformations: {
-    eyebrow: "Le trasformazioni",
-    title: "Coltiviamo qui. Seguiamo ogni trasformazione.",
-    body: `${publicSupplyChain.cultivation} e selezioniamo la materia prima. ${publicSupplyChain.partners}. ${publicSupplyChain.responsibility}.`,
-    steps: [
-      {
-        title: "Coltiviamo",
-        body: "Il Mais Rosso Ottofile cresce nei nostri campi, dalla semina al raccolto.",
-      },
-      {
-        title: "Selezioniamo",
-        body: "Scegliamo la materia prima destinata alle diverse ricette.",
-      },
-      {
-        title: "Lavoriamo con competenze dedicate",
-        body: "La macinazione a pietra e le altre trasformazioni necessarie vengono affidate a partner specializzati.",
-      },
-      {
-        title: "Seguiamo",
-        body: `Qualità, ricette e prodotto finale restano sotto la responsabilità di ${publicBrand.name}.`,
-      },
-    ],
-  },
-  link: { label: "Scopri i prodotti", href: "#prodotti" },
 } as const;
 
 function productRequestHref(productName: string): string {
@@ -269,7 +217,6 @@ export const pageContent = {
   navigation,
   hero: heroContent,
   matter: matterContent,
-  field: fieldContent,
   products: productsContent,
   custody: custodyContent,
   contact: contactContent,

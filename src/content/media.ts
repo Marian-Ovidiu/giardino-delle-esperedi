@@ -17,7 +17,7 @@ export interface BrandMediaAsset {
 const hero: BrandMediaAsset = {
   src: "/images/brand/hero-pannocchie.avif",
   alt: "Due mani reggono cinque pannocchie di mais rosso appena raccolte.",
-  caption: "Mais Rosso Ottofile, raccolto in pannocchia.",
+  caption: null,
   width: 1920,
   height: 1280,
   kind: "documentary",
@@ -35,7 +35,7 @@ const hero: BrandMediaAsset = {
 const matterCob: BrandMediaAsset = {
   src: "/images/brand/materia-pannocchia.avif",
   alt: "Pannocchie di mais rosso tagliate, con chicchi e file visibili.",
-  caption: "La forma del chicco e la disposizione tipica in otto file.",
+  caption: null,
   width: 1440,
   height: 960,
   kind: "documentary",
@@ -49,7 +49,7 @@ const matterCob: BrandMediaAsset = {
 const matterFlour: BrandMediaAsset = {
   src: "/images/brand/chicchi-farina.avif",
   alt: "Chicchi di mais rosso accanto a farina gialla in palette di legno.",
-  caption: "Dal chicco alla farina integrale.",
+  caption: null,
   width: 1440,
   height: 960,
   kind: "documentary",
@@ -63,7 +63,7 @@ const matterFlour: BrandMediaAsset = {
 const field: BrandMediaAsset = {
   src: "/images/brand/campo-maturo.avif",
   alt: "Un campo di mais maturo visto tra gli steli e le foglie.",
-  caption: "Il mais verso la fine del ciclo in campo.",
+  caption: null,
   width: 1920,
   height: 1080,
   kind: "documentary",
@@ -77,7 +77,7 @@ const field: BrandMediaAsset = {
 const harvest: BrandMediaAsset = {
   src: "/images/brand/raccolto-cassette.avif",
   alt: "Cassette piene di pannocchie di mais rosso viste dall'alto.",
-  caption: "Il raccolto varia con ogni annata.",
+  caption: null,
   width: 1200,
   height: 1500,
   kind: "documentary",
@@ -91,7 +91,7 @@ const harvest: BrandMediaAsset = {
 const laMaisera: BrandMediaAsset = {
   src: "/images/brand/maisera-etichetta.webp",
   alt: "Etichetta più recente della birra La Maisèra 8file.",
-  caption: "La Maisèra 8file · etichetta corrente.",
+  caption: null,
   width: 572,
   height: 280,
   kind: "product",
